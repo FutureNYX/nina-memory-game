@@ -690,17 +690,20 @@ html,body{margin:0;padding:0;background:#ECEDF1}
        guessed at here. Stripe is not an option - it does not process
        Russian-issued cards.
 
-       mode: 'link'  -> button becomes a plain link. Drop in a YooKassa /
-                        Tinkoff / Tilda payment URL and you are done.
-       mode: 'tilda' -> button pushes the product into Tilda's own cart, so
-                        it uses whichever gateway is connected to your Tilda
-                        account (YooKassa, Tinkoff, Robokassa, CloudPayments).
-                        Needs a Store block (ST100 / T754) on the page - see
-                        README.
+       mode: 'tilda' (default) -> pushes the product into Tilda's own cart,
+                        so it settles through whichever gateway is connected
+                        to the Tilda account: YooKassa, T-Bank, Robokassa,
+                        CloudPayments, Sberbank or Alfa-Bank - all of which
+                        take Mir and Russian-issued cards, and the first
+                        three also do SBP. Requires an ST100 Store block on
+                        the page (it can be hidden) so that the cart JS is
+                        defined. Fill in the three tilda.* fields below.
+       mode: 'link'  -> button becomes a plain link to any checkout URL.
     ------------------------------------------------------------------ */
     checkout: {
-      mode: 'link',
-      url: '',                                          // <<REPLACE>> checkout URL
+      mode: 'tilda',
+      url: '',                    // only used by mode 'link'; a fallback here
+                                  // is also used if the Tilda cart is missing
       tilda: {
         id: 'nsx-memori-01',
         name: 'Нина Сечко — Мемори',                     // <<REPLACE>>
@@ -960,8 +963,12 @@ html,body{margin:0;padding:0;background:#ECEDF1}
           img: /^https?:/.test(t.img) ? t.img : BASE + t.img,
           url: window.location.href, options: t.options || []
         });
+        if (typeof window.tcart__openCart === 'function') window.tcart__openCart();
+      } else if (cfg.url) {
+        window.location.href = cfg.url;        // fall back rather than dead-end
       } else {
-        console.warn('[nsx] Tilda cart not found. Add a Store block (ST100/T754) to this page.');
+        console.warn('[nsx] Tilda cart not on this page. Add an ST100 Store block, '
+                   + 'or set NSX_CONFIG.checkout.url as a fallback.');
       }
       return;
     }

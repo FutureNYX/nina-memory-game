@@ -126,33 +126,48 @@ spaces per house rule, so don't "tidy" them into `letter-spacing`.
 The block already contains a small CSS override that pushes it out of Tilda's
 960 px container so the hero runs edge to edge.
 
-**The assets can't live in Tilda.** 123 separate frame files is not something
-Tilda's file manager handles well. Host `frames/` and `media/` somewhere with a
-plain HTTPS URL — GitHub Pages is free and fine — then rebuild with
-`--base https://that-host` so every path points at it.
+The block is **38 KB against the T123 limit of 100 000 bytes**, so there is
+about 62 KB of headroom for more copy.
 
-### Payment — not wired yet
+**The assets cannot live in Tilda, and that is Tilda's own position rather than
+a workaround.** Their answer on uploading your own files says plainly: *«В
+данный момент загрузить файлы прямо на Tilda не получится»* — use an external
+service and link to it. So `frames/` and `media/` sit on GitHub Pages, and the
+block points at them. Rebuild with `--base https://that-host` if that ever moves.
 
-You said it has to work with Russian cards, so this is deliberately left
-unconnected rather than guessed at. The button is live and styled; it just has
-no destination.
+### Payment — Tilda's own cart (set up, not yet filled in)
 
-`src/app.js` → `NSX_CONFIG.checkout` has both paths already written:
+Checked against Tilda's current docs, August 2026.
 
-**`mode: 'link'`** — the button becomes a plain link. Drop in any checkout URL:
-a YooKassa (ЮKassa) or Tinkoff payment page, a Tilda payment link, whatever you
-end up using. One line to change.
+**You do not need the Business plan.** Tilda's own comparison table gives
+Personal (500 ₽/mo annual, 750 ₽/mo monthly) all four things this page needs:
 
-**`mode: 'tilda'`** — the button pushes the product into Tilda's own cart, so it
-uses whichever gateway is connected to your Tilda account. This is probably the
-right answer for Russian cards, since Tilda integrates ЮKassa, Tinkoff, Robokassa
-and CloudPayments directly. It needs a **Store block (ST100 / T754)** somewhere
-on the same page — it can be styled invisible, it only has to exist so
-`tcart__addProduct` is defined. Then fill in `checkout.tilda.{id, name, price}`
-to match the Tilda product.
+| Feature | Free | Personal | Business |
+|---|:--:|:--:|:--:|
+| Вставка HTML-кода (the T123 block) | – | ✓ | ✓ |
+| Корзина (cart) | – | ✓ | ✓ |
+| Интеграции с сервисами оплаты | – | ✓ | ✓ |
+| Подключение своего домена | – | ✓ | ✓ |
 
-Note that Stripe does **not** process Russian-issued cards, so ignore any
-Stripe references you see in older comments.
+Business only adds 5 sites, source-code export and a bigger product catalogue.
+
+**Gateways that take Russian cards**, all connectable from Tilda's Payment
+Systems settings: **ЮKassa, Т-Банк, Robokassa, CloudPayments, Сбербанк,
+Альфа-Банк**. ЮKassa, Robokassa and CloudPayments also do **СБП**; ЮKassa,
+CloudPayments and Т-Банк also do Apple/Google Pay.
+
+`NSX_CONFIG.checkout.mode` is set to `'tilda'`. To finish it:
+
+1. Connect your gateway in Tilda: Настройки сайта → Платежные системы.
+2. Add an **ST100** Store block to the same page as the T123 block. It can be
+   styled invisible — it only has to exist so `tcart__addProduct` is defined.
+3. Fill in `checkout.tilda.{id, name, price}` to match the Tilda product.
+
+Until step 2 is done the button falls back to `checkout.url` if you set one,
+and otherwise logs a warning rather than dead-ending silently.
+
+Stripe is in Tilda's list but does **not** process Russian-issued cards —
+ignore it.
 
 ---
 
