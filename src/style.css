@@ -1,0 +1,419 @@
+/* ============================================================
+   NINA SECHKO x ROBINEAU - product page
+   Palette sampled from the film: cool studio grey ground,
+   coral card-back accent, cobalt card-face secondary.
+   ============================================================ */
+.nsx *,.nsx *::before,.nsx *::after{box-sizing:border-box}
+.nsx{
+  --ground:#ECEDF1;
+  --ground-hi:#F5F6FA;
+  --ground-lo:#E1E2E9;
+  --ink:#16161A;
+  --ink-soft:#5D5D68;
+  --ink-mid:#33333C;
+  --ink-faint:#9B9BA6;
+  --rule:rgba(22,22,26,.14);
+  --coral:#D9674F;
+  --cobalt:#0A2D72;
+  --shell:#FFFFFF;
+
+  /* Golos Text is a contemporary Russian family drawn Cyrillic-first, so
+     the running text is not Latin metrics with Cyrillic bolted on.
+     Barlow is kept ONLY for the Latin artist-name lockup - it has no
+     Cyrillic whatsoever and would fall back silently. */
+  --sans:"Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --pad:clamp(20px,5.5vw,64px);
+  --maxw:1180px;
+
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--ground);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-size-adjust:100%;
+  -webkit-text-size-adjust:100%;
+  /* clip, NOT hidden - overflow:hidden on an ancestor kills
+     position:sticky, which is what the whole hero depends on. */
+  overflow-x:clip;
+}
+.nsx img,.nsx video,.nsx canvas{display:block;max-width:100%}
+.nsx p{margin:0}
+.nsx h1,.nsx h2,.nsx h3{margin:0;font-weight:400;letter-spacing:-.015em;line-height:1.06}
+
+/* ---------- shared type ---------- */
+.nsx__eyebrow{
+  font-size:clamp(10px,2.5vw,12px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  font-weight:500;
+}
+.nsx__h2{font-size:clamp(30px,6.2vw,60px)}
+.nsx__h3{font-size:clamp(19px,3.4vw,25px);letter-spacing:-.01em}
+.nsx__body{
+  font-size:clamp(16px,3.9vw,19px);
+  line-height:1.62;
+  color:var(--ink-soft);
+  max-width:62ch;
+}
+.nsx__lead{
+  font-size:clamp(21px,5vw,34px);
+  line-height:1.34;
+  letter-spacing:-.017em;
+  color:var(--ink);
+  max-width:22ch;
+}
+
+/* Artist-name lockup - Barlow Regular, caps, two literal spaces
+   between letters (ROBINEAU house rule). Do NOT swap the spaces
+   for CSS letter-spacing. */
+.nsx__lockup{
+  font-family:"Barlow",Arial,sans-serif;
+  font-weight:400;
+  text-transform:uppercase;
+  white-space:pre-wrap;
+  font-size:clamp(12px,3.2vw,18px);
+  line-height:1.4;
+  color:var(--ink);
+}
+
+.nsx__section{
+  padding:clamp(72px,13vw,150px) var(--pad);
+  max-width:var(--maxw);
+  margin-inline:auto;
+}
+
+/* ============================================================
+   1. SCROLL-SCRUB HERO
+   ============================================================ */
+.nsx__scrolly{
+  position:relative;
+  height:400vh;   /* fallback for browsers without svh */
+  height:400svh;
+  background:radial-gradient(120% 78% at 50% 42%,var(--ground-hi) 0%,var(--ground) 55%,var(--ground-lo) 100%);
+}
+.nsx__stage{
+  position:sticky;
+  top:0;
+  /* svh (not vh / dvh) so the iOS URL bar collapsing never resizes
+     the stage mid-scroll - that is the classic cause of jitter. */
+  height:100vh;   /* fallback */
+  height:100svh;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+}
+/* The canvas is a centred 9:16 box. On a phone it is wider than the
+   screen so the frame covers edge to edge; on desktop it settles to
+   exactly 9:16 and the studio ground either side is the page itself. */
+.nsx__canvas{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  height:100vh;
+  height:100svh;
+  width:min(100%,calc(100vh * 0.5625));
+  width:min(100%,calc(100svh * 0.5625));
+}
+@media (min-width:860px){
+  /* feather the vertical edges into the page ground so there is no seam */
+  .nsx__canvas{
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100%);
+  }
+}
+.nsx__caps{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  padding:var(--pad);
+  padding-left:calc(var(--pad) + env(safe-area-inset-left,0px));
+  padding-right:calc(var(--pad) + env(safe-area-inset-right,0px));
+  display:grid;
+}
+.nsx__cap{
+  grid-area:1/1;
+  align-self:end;
+  justify-self:start;
+  max-width:min(30ch,94%);
+  opacity:0;
+  will-change:opacity,transform;
+  padding-bottom:clamp(52px,10vh,84px);
+}
+.nsx__cap > * + *{margin-top:.7em}
+
+/* On a wide screen the frame is a centred portrait strip, so the
+   captions move out of it and sit in the left gutter, on the ground. */
+@media (min-width:860px){
+  .nsx__cap{
+    align-self:center;
+    padding-bottom:0;
+    max-width:min(32ch,32%);
+  }
+}
+
+/* Light scrim so caption text survives the card burst on phones,
+   where the frame runs edge to edge. Not needed on desktop. */
+.nsx__scrim{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(to top,
+    rgba(236,237,241,.93) 0%,
+    rgba(236,237,241,.82) 13%,
+    rgba(236,237,241,.42) 25%,
+    rgba(236,237,241,0) 39%);
+}
+@media (min-width:860px){.nsx__scrim{display:none}}
+
+.nsx__title{
+  font-size:clamp(44px,13vw,112px);
+  line-height:.94;
+  letter-spacing:-.038em;
+  font-weight:400;
+}
+.nsx__capText{
+  font-size:clamp(16px,4.2vw,21px);
+  line-height:1.45;
+  color:var(--ink-mid);
+  max-width:24ch;
+}
+
+/* scroll hint */
+.nsx__hint{
+  position:absolute;
+  /* bottom-right on phones so it clears the title block */
+  right:calc(var(--pad) + env(safe-area-inset-right,0px));
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:.8em;
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  pointer-events:none;
+  will-change:opacity;
+}
+.nsx__hintBar{
+  display:block;width:1px;height:34px;
+  background:linear-gradient(var(--ink-faint),transparent);
+}
+@media (prefers-reduced-motion:no-preference){
+  .nsx__hintBar{animation:nsxDrop 2.1s ease-in-out infinite}
+}
+@keyframes nsxDrop{
+  0%,100%{transform:scaleY(.35);transform-origin:top;opacity:.35}
+  50%{transform:scaleY(1);transform-origin:top;opacity:1}
+}
+@media (min-width:860px){
+  .nsx__hint{left:50%;right:auto;transform:translateX(-50%);align-items:center}
+}
+
+/* loading meter */
+.nsx__meter{
+  position:absolute;left:0;top:0;height:2px;width:100%;
+  pointer-events:none;
+}
+.nsx__meterFill{
+  height:100%;width:0%;
+  background:var(--coral);
+  transition:width .3s linear,opacity .6s .4s;
+}
+
+/* ============================================================
+   2. STATEMENT
+   ============================================================ */
+.nsx__statement .nsx__eyebrow{margin-bottom:clamp(20px,4vw,32px)}
+.nsx__statement .nsx__lead{max-width:24ch;margin-bottom:clamp(26px,5vw,40px)}
+
+/* ============================================================
+   3. PLAY (looping film)
+   ============================================================ */
+.nsx__play{
+  display:grid;
+  gap:clamp(28px,5vw,64px);
+  align-items:center;
+  grid-template-columns:1fr;
+}
+@media (min-width:860px){
+  .nsx__play{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}
+}
+.nsx__playFrame{
+  position:relative;
+  border-radius:14px;
+  overflow:hidden;
+  background:var(--ground-lo);
+  aspect-ratio:9/16;
+  max-height:74svh;
+  margin-inline:auto;
+  width:100%;
+}
+.nsx__playFrame video{width:100%;height:100%;object-fit:cover}
+.nsx__playCopy > * + *{margin-top:clamp(14px,2.6vw,22px)}
+
+/* ============================================================
+   4. FEATURE TRIPTYCH
+   ============================================================ */
+.nsx__grid{
+  display:grid;
+  gap:clamp(24px,4vw,40px);
+  grid-template-columns:1fr;
+}
+@media (min-width:720px){.nsx__grid{grid-template-columns:repeat(3,1fr)}}
+.nsx__card figure{margin:0}
+.nsx__card img{
+  width:100%;
+  /* height:auto is required - the width/height HTML attributes are
+     presentational hints and would otherwise beat aspect-ratio. */
+  height:auto;
+  aspect-ratio:4/5;
+  object-fit:cover;
+  object-position:center 48%;
+  border-radius:12px;
+  background:var(--ground-lo);
+}
+.nsx__card figcaption{margin-top:clamp(14px,2.4vw,20px)}
+.nsx__card h3{margin-bottom:.42em}
+.nsx__card p{font-size:clamp(15px,3.6vw,17px);line-height:1.55;color:var(--ink-soft)}
+
+/* ============================================================
+   5. SPECS
+   ============================================================ */
+.nsx__specs{
+  border-top:1px solid var(--rule);
+  margin-top:clamp(34px,6vw,54px);
+}
+.nsx__spec{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:4px;
+  padding:clamp(16px,3vw,22px) 0;
+  border-bottom:1px solid var(--rule);
+}
+@media (min-width:640px){
+  .nsx__spec{grid-template-columns:minmax(0,13rem) 1fr;gap:24px;align-items:baseline}
+}
+.nsx__spec dt{
+  font-size:clamp(11px,2.6vw,12px);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  font-weight:500;
+}
+.nsx__spec dd{margin:0;font-size:clamp(16px,3.8vw,18px);line-height:1.5;color:var(--ink)}
+
+/* ============================================================
+   6. BUY
+   ============================================================ */
+.nsx__buy{
+  background:var(--shell);
+  border-radius:clamp(16px,3vw,22px);
+  padding:clamp(28px,6vw,62px);
+  display:grid;
+  gap:clamp(24px,4vw,48px);
+  grid-template-columns:1fr;
+  align-items:center;
+  box-shadow:0 1px 2px rgba(22,22,26,.05),0 24px 60px -34px rgba(22,22,26,.4);
+}
+@media (min-width:820px){.nsx__buy{grid-template-columns:minmax(0,320px) 1fr}}
+.nsx__buyMedia{
+  border-radius:12px;overflow:hidden;background:var(--ground);
+  aspect-ratio:1/1;
+}
+.nsx__buyMedia img{width:100%;height:100%;object-fit:cover}
+.nsx__price{
+  display:flex;align-items:baseline;gap:.6em;flex-wrap:wrap;
+  margin:clamp(16px,3vw,22px) 0 clamp(20px,3.6vw,28px);
+}
+.nsx__priceNow{font-size:clamp(30px,7vw,44px);line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.nsx__priceNote{font-size:14px;color:var(--ink-faint)}
+
+.nsx__btn{
+  -webkit-appearance:none;appearance:none;
+  display:inline-flex;align-items:center;justify-content:center;gap:.6em;
+  width:100%;
+  min-height:56px;
+  padding:17px 30px;
+  border:0;border-radius:100px;
+  background:var(--ink);color:#fff;
+  font-family:inherit;
+  font-size:clamp(16px,3.9vw,17px);
+  font-weight:500;letter-spacing:.02em;
+  cursor:pointer;
+  text-decoration:none;
+  transition:transform .18s cubic-bezier(.2,.7,.3,1),background-color .2s;
+  touch-action:manipulation;
+}
+.nsx__btn:hover{background:var(--coral)}
+.nsx__btn:active{transform:scale(.985)}
+.nsx__btn:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
+.nsx__btn[disabled]{opacity:.45;pointer-events:none}
+.nsx__reassure{
+  margin-top:14px;font-size:14px;line-height:1.55;color:var(--ink-faint);text-align:center;
+}
+
+/* sticky mobile buy bar */
+.nsx__dock{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:40;
+  padding:10px var(--pad) calc(10px + env(safe-area-inset-bottom,0px));
+  background:rgba(236,237,241,.86);
+  -webkit-backdrop-filter:saturate(160%) blur(14px);
+  backdrop-filter:saturate(160%) blur(14px);
+  border-top:1px solid var(--rule);
+  transform:translateY(110%);
+  transition:transform .38s cubic-bezier(.2,.7,.3,1);
+}
+.nsx__dock.is-on{transform:none}
+.nsx__dock .nsx__btn{min-height:50px;padding:13px 24px}
+@media (min-width:820px){.nsx__dock{display:none}}
+
+/* ============================================================
+   7. FOOTER
+   ============================================================ */
+.nsx__footer{
+  border-top:1px solid var(--rule);
+  padding:clamp(46px,8vw,80px) var(--pad);
+  padding-bottom:calc(clamp(46px,8vw,80px) + env(safe-area-inset-bottom,0px) + 60px);
+  max-width:var(--maxw);margin-inline:auto;
+}
+@media (min-width:820px){
+  .nsx__footer{padding-bottom:clamp(46px,8vw,80px)}
+}
+.nsx__footGrid{
+  display:grid;gap:clamp(26px,4vw,40px);grid-template-columns:1fr;
+}
+@media (min-width:720px){.nsx__footGrid{grid-template-columns:repeat(3,1fr)}}
+.nsx__footGrid h3{
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:.95em;font-weight:500;
+}
+.nsx__footGrid p,.nsx__footGrid a{
+  font-size:15px;line-height:1.62;color:var(--ink-soft);
+  text-decoration:none;display:block;
+}
+.nsx__footGrid a:hover{color:var(--coral)}
+.nsx__colophon{
+  margin-top:clamp(34px,6vw,56px);padding-top:22px;border-top:1px solid var(--rule);
+  font-size:13px;color:var(--ink-faint);
+}
+
+/* ---------- scroll reveal ---------- */
+.nsx__rise{opacity:0;transform:translateY(22px)}
+.nsx__rise.is-in{
+  opacity:1;transform:none;
+  transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);
+}
+@media (prefers-reduced-motion:reduce){
+  .nsx__rise{opacity:1;transform:none;transition:none}
+  .nsx__hintBar{animation:none}
+  .nsx__dock{transition:none}
+}
+
+/* ---------- runway tuning ---------- */
+@media (min-width:860px){.nsx__scrolly{height:520vh;height:520svh}}
+@media (max-width:520px){.nsx__scrolly{height:360vh;height:360svh}}

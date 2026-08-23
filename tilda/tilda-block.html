@@ -1,0 +1,978 @@
+<!-- ===========================================================
+     PASTE THIS WHOLE THING INTO ONE TILDA "T123 / HTML code" BLOCK.
+     Asset host: https://futurenyx.github.io/nina-memory-game
+     Rebuild with:  python build.py --base <url>
+     =========================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* let the block run edge to edge inside Tilda's container */
+.t-rec .t123__wrapper,.t123 .t-container,.t123 .t-col{max-width:100%!important;padding:0!important;margin:0!important}
+.t-body{background:#ECEDF1}
+/* ============================================================
+   NINA SECHKO x ROBINEAU - product page
+   Palette sampled from the film: cool studio grey ground,
+   coral card-back accent, cobalt card-face secondary.
+   ============================================================ */
+.nsx *,.nsx *::before,.nsx *::after{box-sizing:border-box}
+.nsx{
+  --ground:#ECEDF1;
+  --ground-hi:#F5F6FA;
+  --ground-lo:#E1E2E9;
+  --ink:#16161A;
+  --ink-soft:#5D5D68;
+  --ink-mid:#33333C;
+  --ink-faint:#9B9BA6;
+  --rule:rgba(22,22,26,.14);
+  --coral:#D9674F;
+  --cobalt:#0A2D72;
+  --shell:#FFFFFF;
+
+  /* Golos Text is a contemporary Russian family drawn Cyrillic-first, so
+     the running text is not Latin metrics with Cyrillic bolted on.
+     Barlow is kept ONLY for the Latin artist-name lockup - it has no
+     Cyrillic whatsoever and would fall back silently. */
+  --sans:"Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --pad:clamp(20px,5.5vw,64px);
+  --maxw:1180px;
+
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--ground);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-size-adjust:100%;
+  -webkit-text-size-adjust:100%;
+  /* clip, NOT hidden - overflow:hidden on an ancestor kills
+     position:sticky, which is what the whole hero depends on. */
+  overflow-x:clip;
+}
+.nsx img,.nsx video,.nsx canvas{display:block;max-width:100%}
+.nsx p{margin:0}
+.nsx h1,.nsx h2,.nsx h3{margin:0;font-weight:400;letter-spacing:-.015em;line-height:1.06}
+
+/* ---------- shared type ---------- */
+.nsx__eyebrow{
+  font-size:clamp(10px,2.5vw,12px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  font-weight:500;
+}
+.nsx__h2{font-size:clamp(30px,6.2vw,60px)}
+.nsx__h3{font-size:clamp(19px,3.4vw,25px);letter-spacing:-.01em}
+.nsx__body{
+  font-size:clamp(16px,3.9vw,19px);
+  line-height:1.62;
+  color:var(--ink-soft);
+  max-width:62ch;
+}
+.nsx__lead{
+  font-size:clamp(21px,5vw,34px);
+  line-height:1.34;
+  letter-spacing:-.017em;
+  color:var(--ink);
+  max-width:22ch;
+}
+
+/* Artist-name lockup - Barlow Regular, caps, two literal spaces
+   between letters (ROBINEAU house rule). Do NOT swap the spaces
+   for CSS letter-spacing. */
+.nsx__lockup{
+  font-family:"Barlow",Arial,sans-serif;
+  font-weight:400;
+  text-transform:uppercase;
+  white-space:pre-wrap;
+  font-size:clamp(12px,3.2vw,18px);
+  line-height:1.4;
+  color:var(--ink);
+}
+
+.nsx__section{
+  padding:clamp(72px,13vw,150px) var(--pad);
+  max-width:var(--maxw);
+  margin-inline:auto;
+}
+
+/* ============================================================
+   1. SCROLL-SCRUB HERO
+   ============================================================ */
+.nsx__scrolly{
+  position:relative;
+  height:400vh;   /* fallback for browsers without svh */
+  height:400svh;
+  background:radial-gradient(120% 78% at 50% 42%,var(--ground-hi) 0%,var(--ground) 55%,var(--ground-lo) 100%);
+}
+.nsx__stage{
+  position:sticky;
+  top:0;
+  /* svh (not vh / dvh) so the iOS URL bar collapsing never resizes
+     the stage mid-scroll - that is the classic cause of jitter. */
+  height:100vh;   /* fallback */
+  height:100svh;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+}
+/* The canvas is a centred 9:16 box. On a phone it is wider than the
+   screen so the frame covers edge to edge; on desktop it settles to
+   exactly 9:16 and the studio ground either side is the page itself. */
+.nsx__canvas{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  height:100vh;
+  height:100svh;
+  width:min(100%,calc(100vh * 0.5625));
+  width:min(100%,calc(100svh * 0.5625));
+}
+@media (min-width:860px){
+  /* feather the vertical edges into the page ground so there is no seam */
+  .nsx__canvas{
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100%);
+  }
+}
+.nsx__caps{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  padding:var(--pad);
+  padding-left:calc(var(--pad) + env(safe-area-inset-left,0px));
+  padding-right:calc(var(--pad) + env(safe-area-inset-right,0px));
+  display:grid;
+}
+.nsx__cap{
+  grid-area:1/1;
+  align-self:end;
+  justify-self:start;
+  max-width:min(30ch,94%);
+  opacity:0;
+  will-change:opacity,transform;
+  padding-bottom:clamp(52px,10vh,84px);
+}
+.nsx__cap > * + *{margin-top:.7em}
+
+/* On a wide screen the frame is a centred portrait strip, so the
+   captions move out of it and sit in the left gutter, on the ground. */
+@media (min-width:860px){
+  .nsx__cap{
+    align-self:center;
+    padding-bottom:0;
+    max-width:min(32ch,32%);
+  }
+}
+
+/* Light scrim so caption text survives the card burst on phones,
+   where the frame runs edge to edge. Not needed on desktop. */
+.nsx__scrim{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(to top,
+    rgba(236,237,241,.93) 0%,
+    rgba(236,237,241,.82) 13%,
+    rgba(236,237,241,.42) 25%,
+    rgba(236,237,241,0) 39%);
+}
+@media (min-width:860px){.nsx__scrim{display:none}}
+
+.nsx__title{
+  font-size:clamp(44px,13vw,112px);
+  line-height:.94;
+  letter-spacing:-.038em;
+  font-weight:400;
+}
+.nsx__capText{
+  font-size:clamp(16px,4.2vw,21px);
+  line-height:1.45;
+  color:var(--ink-mid);
+  max-width:24ch;
+}
+
+/* scroll hint */
+.nsx__hint{
+  position:absolute;
+  /* bottom-right on phones so it clears the title block */
+  right:calc(var(--pad) + env(safe-area-inset-right,0px));
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:.8em;
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  pointer-events:none;
+  will-change:opacity;
+}
+.nsx__hintBar{
+  display:block;width:1px;height:34px;
+  background:linear-gradient(var(--ink-faint),transparent);
+}
+@media (prefers-reduced-motion:no-preference){
+  .nsx__hintBar{animation:nsxDrop 2.1s ease-in-out infinite}
+}
+@keyframes nsxDrop{
+  0%,100%{transform:scaleY(.35);transform-origin:top;opacity:.35}
+  50%{transform:scaleY(1);transform-origin:top;opacity:1}
+}
+@media (min-width:860px){
+  .nsx__hint{left:50%;right:auto;transform:translateX(-50%);align-items:center}
+}
+
+/* loading meter */
+.nsx__meter{
+  position:absolute;left:0;top:0;height:2px;width:100%;
+  pointer-events:none;
+}
+.nsx__meterFill{
+  height:100%;width:0%;
+  background:var(--coral);
+  transition:width .3s linear,opacity .6s .4s;
+}
+
+/* ============================================================
+   2. STATEMENT
+   ============================================================ */
+.nsx__statement .nsx__eyebrow{margin-bottom:clamp(20px,4vw,32px)}
+.nsx__statement .nsx__lead{max-width:24ch;margin-bottom:clamp(26px,5vw,40px)}
+
+/* ============================================================
+   3. PLAY (looping film)
+   ============================================================ */
+.nsx__play{
+  display:grid;
+  gap:clamp(28px,5vw,64px);
+  align-items:center;
+  grid-template-columns:1fr;
+}
+@media (min-width:860px){
+  .nsx__play{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}
+}
+.nsx__playFrame{
+  position:relative;
+  border-radius:14px;
+  overflow:hidden;
+  background:var(--ground-lo);
+  aspect-ratio:9/16;
+  max-height:74svh;
+  margin-inline:auto;
+  width:100%;
+}
+.nsx__playFrame video{width:100%;height:100%;object-fit:cover}
+.nsx__playCopy > * + *{margin-top:clamp(14px,2.6vw,22px)}
+
+/* ============================================================
+   4. FEATURE TRIPTYCH
+   ============================================================ */
+.nsx__grid{
+  display:grid;
+  gap:clamp(24px,4vw,40px);
+  grid-template-columns:1fr;
+}
+@media (min-width:720px){.nsx__grid{grid-template-columns:repeat(3,1fr)}}
+.nsx__card figure{margin:0}
+.nsx__card img{
+  width:100%;
+  /* height:auto is required - the width/height HTML attributes are
+     presentational hints and would otherwise beat aspect-ratio. */
+  height:auto;
+  aspect-ratio:4/5;
+  object-fit:cover;
+  object-position:center 48%;
+  border-radius:12px;
+  background:var(--ground-lo);
+}
+.nsx__card figcaption{margin-top:clamp(14px,2.4vw,20px)}
+.nsx__card h3{margin-bottom:.42em}
+.nsx__card p{font-size:clamp(15px,3.6vw,17px);line-height:1.55;color:var(--ink-soft)}
+
+/* ============================================================
+   5. SPECS
+   ============================================================ */
+.nsx__specs{
+  border-top:1px solid var(--rule);
+  margin-top:clamp(34px,6vw,54px);
+}
+.nsx__spec{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:4px;
+  padding:clamp(16px,3vw,22px) 0;
+  border-bottom:1px solid var(--rule);
+}
+@media (min-width:640px){
+  .nsx__spec{grid-template-columns:minmax(0,13rem) 1fr;gap:24px;align-items:baseline}
+}
+.nsx__spec dt{
+  font-size:clamp(11px,2.6vw,12px);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  font-weight:500;
+}
+.nsx__spec dd{margin:0;font-size:clamp(16px,3.8vw,18px);line-height:1.5;color:var(--ink)}
+
+/* ============================================================
+   6. BUY
+   ============================================================ */
+.nsx__buy{
+  background:var(--shell);
+  border-radius:clamp(16px,3vw,22px);
+  padding:clamp(28px,6vw,62px);
+  display:grid;
+  gap:clamp(24px,4vw,48px);
+  grid-template-columns:1fr;
+  align-items:center;
+  box-shadow:0 1px 2px rgba(22,22,26,.05),0 24px 60px -34px rgba(22,22,26,.4);
+}
+@media (min-width:820px){.nsx__buy{grid-template-columns:minmax(0,320px) 1fr}}
+.nsx__buyMedia{
+  border-radius:12px;overflow:hidden;background:var(--ground);
+  aspect-ratio:1/1;
+}
+.nsx__buyMedia img{width:100%;height:100%;object-fit:cover}
+.nsx__price{
+  display:flex;align-items:baseline;gap:.6em;flex-wrap:wrap;
+  margin:clamp(16px,3vw,22px) 0 clamp(20px,3.6vw,28px);
+}
+.nsx__priceNow{font-size:clamp(30px,7vw,44px);line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.nsx__priceNote{font-size:14px;color:var(--ink-faint)}
+
+.nsx__btn{
+  -webkit-appearance:none;appearance:none;
+  display:inline-flex;align-items:center;justify-content:center;gap:.6em;
+  width:100%;
+  min-height:56px;
+  padding:17px 30px;
+  border:0;border-radius:100px;
+  background:var(--ink);color:#fff;
+  font-family:inherit;
+  font-size:clamp(16px,3.9vw,17px);
+  font-weight:500;letter-spacing:.02em;
+  cursor:pointer;
+  text-decoration:none;
+  transition:transform .18s cubic-bezier(.2,.7,.3,1),background-color .2s;
+  touch-action:manipulation;
+}
+.nsx__btn:hover{background:var(--coral)}
+.nsx__btn:active{transform:scale(.985)}
+.nsx__btn:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
+.nsx__btn[disabled]{opacity:.45;pointer-events:none}
+.nsx__reassure{
+  margin-top:14px;font-size:14px;line-height:1.55;color:var(--ink-faint);text-align:center;
+}
+
+/* sticky mobile buy bar */
+.nsx__dock{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:40;
+  padding:10px var(--pad) calc(10px + env(safe-area-inset-bottom,0px));
+  background:rgba(236,237,241,.86);
+  -webkit-backdrop-filter:saturate(160%) blur(14px);
+  backdrop-filter:saturate(160%) blur(14px);
+  border-top:1px solid var(--rule);
+  transform:translateY(110%);
+  transition:transform .38s cubic-bezier(.2,.7,.3,1);
+}
+.nsx__dock.is-on{transform:none}
+.nsx__dock .nsx__btn{min-height:50px;padding:13px 24px}
+@media (min-width:820px){.nsx__dock{display:none}}
+
+/* ============================================================
+   7. FOOTER
+   ============================================================ */
+.nsx__footer{
+  border-top:1px solid var(--rule);
+  padding:clamp(46px,8vw,80px) var(--pad);
+  padding-bottom:calc(clamp(46px,8vw,80px) + env(safe-area-inset-bottom,0px) + 60px);
+  max-width:var(--maxw);margin-inline:auto;
+}
+@media (min-width:820px){
+  .nsx__footer{padding-bottom:clamp(46px,8vw,80px)}
+}
+.nsx__footGrid{
+  display:grid;gap:clamp(26px,4vw,40px);grid-template-columns:1fr;
+}
+@media (min-width:720px){.nsx__footGrid{grid-template-columns:repeat(3,1fr)}}
+.nsx__footGrid h3{
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:.95em;font-weight:500;
+}
+.nsx__footGrid p,.nsx__footGrid a{
+  font-size:15px;line-height:1.62;color:var(--ink-soft);
+  text-decoration:none;display:block;
+}
+.nsx__footGrid a:hover{color:var(--coral)}
+.nsx__colophon{
+  margin-top:clamp(34px,6vw,56px);padding-top:22px;border-top:1px solid var(--rule);
+  font-size:13px;color:var(--ink-faint);
+}
+
+/* ---------- scroll reveal ---------- */
+.nsx__rise{opacity:0;transform:translateY(22px)}
+.nsx__rise.is-in{
+  opacity:1;transform:none;
+  transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);
+}
+@media (prefers-reduced-motion:reduce){
+  .nsx__rise{opacity:1;transform:none;transition:none}
+  .nsx__hintBar{animation:none}
+  .nsx__dock{transition:none}
+}
+
+/* ---------- runway tuning ---------- */
+@media (min-width:860px){.nsx__scrolly{height:520vh;height:520svh}}
+@media (max-width:520px){.nsx__scrolly{height:360vh;height:360svh}}
+
+</style>
+
+<!-- =========================================================
+     NINA SECHKO x ROBINEAU - product page (RU)
+     All wording lives in this file. Anything tagged REPLACE in a
+     trailing comment is placeholder text awaiting the real copy.
+     House rule: no "e with diaeresis" anywhere in the Russian.
+     https://futurenyx.github.io/nina-memory-game is rewritten by build.py to the asset host.
+     ========================================================= -->
+<div class="nsx">
+
+  <noscript><style>
+    /* without JS there is no scrub, so collapse the runway to one screen
+       and pin the opening caption */
+    .nsx__scrolly{height:100vh;height:100svh}
+    .nsx__cap--intro{opacity:1!important}
+    .nsx__hint{display:none}
+  </style></noscript>
+
+  <!-- ============ 1. SCROLL-SCRUB HERO ============ -->
+  <section class="nsx__scrolly" id="nsx-open" aria-label="Коробка открывается">
+    <div class="nsx__stage">
+
+      <canvas class="nsx__canvas"
+              role="img"
+              aria-label="Собранная вручную коробка раскрывается, и из нее вылетает колода карт с картинами"
+              style="background:#ECEDF1 url('https://futurenyx.github.io/nina-memory-game/media/poster.webp') center/cover no-repeat"></canvas>
+
+      <div class="nsx__scrim" aria-hidden="true"></div>
+
+      <div class="nsx__meter" aria-hidden="true"><span class="nsx__meterFill"></span></div>
+
+      <div class="nsx__caps">
+
+        <div class="nsx__cap nsx__cap--intro" data-from="0.00" data-to="0.15" style="opacity:1">
+          <p class="nsx__eyebrow">ROBINEAU &times; НИНА СЕЧКО</p>
+          <h1 class="nsx__title">Мемори</h1><!-- REPLACE: название продукта -->
+          <p class="nsx__capText">Коллекционное издание: живопись, в которую играют.</p><!-- REPLACE -->
+        </div>
+
+        <div class="nsx__cap" data-from="0.26" data-to="0.42">
+          <p class="nsx__eyebrow">Коробка</p>
+          <p class="nsx__capText">Собрана вручную и раскрывается сразу на четыре стороны.</p><!-- REPLACE -->
+        </div>
+
+        <div class="nsx__cap" data-from="0.54" data-to="0.70">
+          <p class="nsx__eyebrow">Внутри</p>
+          <p class="nsx__capText">Полная колода, напечатанная с оригинальных работ.</p><!-- REPLACE -->
+        </div>
+
+        <div class="nsx__cap" data-from="0.85" data-to="1.00">
+          <p class="nsx__eyebrow">Игра</p>
+          <p class="nsx__capText">Переверните две карты. Найдите пару. Заберите картину.</p><!-- REPLACE -->
+        </div>
+
+      </div>
+
+      <div class="nsx__hint" aria-hidden="true">
+        <span>Листайте</span>
+        <span class="nsx__hintBar"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. STATEMENT ============ -->
+  <section class="nsx__section nsx__statement">
+    <p class="nsx__eyebrow nsx__rise">Издание</p>
+    <h2 class="nsx__h2 nsx__lead nsx__rise">Галерейное издание, которое ведет себя как игрушка.</h2><!-- REPLACE -->
+    <p class="nsx__body nsx__rise">
+      Живопись Нины Сечко исследует созерцание себя &mdash; интимно, игриво и с тихой иронией по
+      отношению к миру природы. Ее визуальные источники &mdash; комиксы, аниме и иллюстрированные
+      книги русского детства. Это издание собирает те же образы в колоду, а колоду &mdash; в коробку,
+      которая раскрывается как бумажная инженерия.
+    </p><!-- REPLACE: полное описание продукта -->
+  </section>
+
+  <!-- ============ 3. HOW IT PLAYS ============ -->
+  <section class="nsx__section">
+    <div class="nsx__play">
+      <div class="nsx__playFrame nsx__rise">
+        <video
+          src="https://futurenyx.github.io/nina-memory-game/media/play.mp4"
+          poster="https://futurenyx.github.io/nina-memory-game/media/still-spread.webp"
+          muted playsinline loop preload="metadata"
+          disablepictureinpicture
+          aria-label="Карты разложены и разыгрываются как игра на память"></video>
+      </div>
+      <div class="nsx__playCopy">
+        <p class="nsx__eyebrow nsx__rise">Как играть</p>
+        <h2 class="nsx__h2 nsx__rise">Переверните две.<br>Найдите пару.</h2><!-- REPLACE -->
+        <p class="nsx__body nsx__rise">
+          Разложите карты рубашкой вверх. Переворачивайте по две за ход. Совпала картина со своей
+          парой &mdash; пара ваша. От двух до шести игроков, десять минут на партию, читать не нужно
+          &mdash; поэтому это в равной мере детская игра и предмет коллекционера.
+        </p><!-- REPLACE: проверьте правила -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. WHAT ARRIVES ============ -->
+  <section class="nsx__section">
+    <p class="nsx__eyebrow nsx__rise" style="margin-bottom:clamp(28px,5vw,48px)">Что вы получите</p>
+    <div class="nsx__grid">
+
+      <div class="nsx__card nsx__rise">
+        <figure>
+          <img src="https://futurenyx.github.io/nina-memory-game/media/still-open.webp" alt="Раскрытая коробка" loading="lazy" decoding="async" width="900" height="1600">
+          <figcaption>
+            <h3 class="nsx__h3">Коробка</h3><!-- REPLACE -->
+            <p>Собрана вручную, раскрывается на четыре стороны, со всех сторон напечатана работами художницы.</p><!-- REPLACE -->
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="nsx__card nsx__rise">
+        <figure>
+          <img src="https://futurenyx.github.io/nina-memory-game/media/still-spread.webp" alt="Разложенные карты с картинами" loading="lazy" decoding="async" width="900" height="1600">
+          <figcaption>
+            <h3 class="nsx__h3">Картины</h3><!-- REPLACE -->
+            <p>Работы, воспроизведенные с оригиналов; каждая встречается в колоде дважды.</p><!-- REPLACE -->
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="nsx__card nsx__rise">
+        <figure>
+          <img src="https://futurenyx.github.io/nina-memory-game/media/still-backs.webp" alt="Рубашка карт" loading="lazy" decoding="async" width="900" height="1600">
+          <figcaption>
+            <h3 class="nsx__h3">Рубашка</h3><!-- REPLACE -->
+            <p>Единое непрерывное изображение на обороте каждой карты, с подписью художницы.</p><!-- REPLACE -->
+          </figcaption>
+        </figure>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 5. SPECIFICATION ============ -->
+  <section class="nsx__section">
+    <p class="nsx__eyebrow nsx__rise">Характеристики</p>
+    <h2 class="nsx__h2 nsx__rise" style="margin-top:.4em">Детали</h2>
+
+    <dl class="nsx__specs nsx__rise"><!-- REPLACE: все значения ниже -->
+      <div class="nsx__spec"><dt>Художник</dt><dd>Нина Сечко (р. 1992, Москва)</dd></div>
+      <div class="nsx__spec"><dt>Тираж</dt><dd>Лимитированный тираж 000, нумерованный</dd></div>
+      <div class="nsx__spec"><dt>Состав</dt><dd>00 карт / 00 картин, каждая парой</dd></div>
+      <div class="nsx__spec"><dt>Размер карты</dt><dd>00 &times; 00 мм, 000 г/м&sup2;</dd></div>
+      <div class="nsx__spec"><dt>Коробка</dt><dd>00 &times; 00 &times; 00 мм, ручная сборка</dd></div>
+      <div class="nsx__spec"><dt>Игроки</dt><dd>2&ndash;6, от 0 лет</dd></div>
+      <div class="nsx__spec"><dt>Издатель</dt><dd>ROBINEAU</dd></div>
+    </dl>
+  </section>
+
+  <!-- ============ 6. BUY ============ -->
+  <section class="nsx__section" id="nsx-buy">
+    <div class="nsx__buy nsx__rise">
+
+      <div class="nsx__buyMedia">
+        <img src="https://futurenyx.github.io/nina-memory-game/media/still-backs.webp" alt="Рубашка карт" loading="lazy" decoding="async" width="900" height="1600">
+      </div>
+
+      <div>
+        <p class="nsx__eyebrow">Заказ</p>
+        <h2 class="nsx__h2" style="margin-top:.35em;font-size:clamp(26px,5.4vw,40px)">
+          Мемори
+        </h2><!-- REPLACE: название продукта -->
+
+        <!-- Artist name lockup: Barlow Regular, caps, two literal spaces.
+             Kept in Latin because Barlow has no Cyrillic at all - a Cyrillic
+             lockup here would silently fall back to a system font. -->
+        <p class="nsx__lockup" style="margin-top:1.1em">N&nbsp;&nbsp;I&nbsp;&nbsp;N&nbsp;&nbsp;A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S&nbsp;&nbsp;E&nbsp;&nbsp;C&nbsp;&nbsp;H&nbsp;&nbsp;K&nbsp;&nbsp;O</p>
+
+        <div class="nsx__price">
+          <span class="nsx__priceNow">4&nbsp;500&nbsp;&#8381;</span><!-- REPLACE: цена -->
+          <span class="nsx__priceNote">Доставка включена</span><!-- REPLACE -->
+        </div>
+
+        <a class="nsx__btn" data-nsx-buy href="#" role="button">В корзину</a><!-- REPLACE: текст кнопки -->
+
+        <p class="nsx__reassure">
+          Отправка в течение 3 рабочих дней &middot; С отслеживанием &middot; Возврат в течение 14 дней
+        </p><!-- REPLACE -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 7. FOOTER ============ -->
+  <footer class="nsx__footer">
+    <div class="nsx__footGrid">
+
+      <div>
+        <h3>Международные коммуникации</h3>
+        <p>Патрик Робино</p>
+        <a href="mailto:patrick@robineauart.com">patrick@robineauart.com</a>
+        <a href="tel:+79266806626">+7 926 680-66-26</a>
+      </div>
+
+      <div>
+        <h3>Русские и китайские коммуникации</h3>
+        <p>Валентина Робино</p>
+        <a href="mailto:valentina@robineauart.com">valentina@robineauart.com</a>
+        <a href="tel:+79143382234">+7 914 338-22-34</a>
+      </div>
+
+      <div>
+        <h3>ROBINEAU</h3>
+        <a href="https://www.robineauart.com" target="_blank" rel="noopener">robineauart.com</a>
+        <a href="https://www.instagram.com/robineau_gallery" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://t.me/robineauart" target="_blank" rel="noopener">Telegram</a>
+      </div>
+
+    </div>
+
+    <p class="nsx__colophon">
+      &copy; ROBINEAU. Работы &copy; Нина Сечко. Кураторство на пересечении традиции и технологии,
+      улавливая дух нашего времени.
+    </p>
+  </footer>
+
+  <!-- sticky buy bar, phones only -->
+  <div class="nsx__dock">
+    <a class="nsx__btn" data-nsx-buy href="#" role="button">В корзину &mdash; 4&nbsp;500&nbsp;&#8381;</a><!-- REPLACE -->
+  </div>
+
+</div>
+
+
+<script>
+/* ============================================================
+   NINA SECHKO x ROBINEAU - scroll-scrub product page
+   ------------------------------------------------------------
+   EVERYTHING YOU NEED TO EDIT IS IN NSX_CONFIG BELOW.
+   All visible wording lives in the HTML, not in here.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var NSX_CONFIG = {
+
+    /* Where the frames / video / stills live.
+       Local preview: '.'   Tilda: the full https:// base of your asset host. */
+    assetBase: 'https://futurenyx.github.io/nina-memory-game',
+
+    /* ---- the box-opening sequence ---- */
+    frameCount: 123,
+    framePrefix: '/frames/f_',
+    frameExt: '.webp',
+
+    /* ---- CHECKOUT --------------------------------------------------
+       mode: 'link'  -> button is a plain link (Stripe Payment Link,
+                        Tilda payment page, PayPal, anything).
+       mode: 'tilda' -> button pushes the product into Tilda's own cart
+                        (needs a Store block on the page - see README).
+    ------------------------------------------------------------------ */
+    checkout: {
+      mode: 'link',
+      url: 'https://buy.stripe.com/REPLACE_ME',        // <<REPLACE>>
+      tilda: {
+        id: 'nsx-memory-01',
+        name: 'Nina Sechko - The Memory Game',          // <<REPLACE>>
+        price: '4500',                                  // <<REPLACE>> minor units per Tilda setup
+        img: '/media/still-backs.webp',
+        options: []
+      }
+    }
+  };
+
+  /* ==========================================================
+     Nothing below here normally needs editing.
+     ========================================================== */
+
+  var root = document.querySelector('.nsx');
+  if (!root) return;
+
+  var BASE = (NSX_CONFIG.assetBase || '.').replace(/\/$/, '');
+  var TOTAL = NSX_CONFIG.frameCount;
+  var FRAME_W = 756, FRAME_H = 1344;
+  var FRAME_AR = FRAME_W / FRAME_H;
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+
+  function frameUrl(i) {
+    /* the self-contained preview build inlines every frame as a data URI */
+    if (window.NSX_FRAMES) return window.NSX_FRAMES[i - 1];
+    var n = String(i);
+    while (n.length < 3) n = '0' + n;
+    return BASE + NSX_CONFIG.framePrefix + n + NSX_CONFIG.frameExt;
+  }
+
+  /* ---------------------------------------------------------
+     Frame loading: two passes.
+     Pass 1 loads every 6th frame so the sequence is scrubbable
+     after ~500KB. Pass 2 fills in the gaps. The scrubber always
+     draws the nearest frame it actually has.
+     --------------------------------------------------------- */
+  var imgs = new Array(TOTAL + 1);
+  var loadedCount = 0;
+  var meterFill = root.querySelector('.nsx__meterFill');
+
+  function bumpMeter() {
+    if (!meterFill) return;
+    var pct = Math.round((loadedCount / TOTAL) * 100);
+    meterFill.style.width = pct + '%';
+    if (pct >= 100) meterFill.style.opacity = '0';
+  }
+
+  function loadFrame(i) {
+    return new Promise(function (resolve) {
+      if (imgs[i]) return resolve();
+      var im = new Image();
+      im.decoding = 'async';
+      im.onload = function () {
+        imgs[i] = im; loadedCount++; bumpMeter();
+        /* a sharper frame for where we are standing just arrived - redraw */
+        if (i === lastFrame) lastDrawn = -1;
+        resolve();
+      };
+      im.onerror = function () { loadedCount++; bumpMeter(); resolve(); };
+      im.src = frameUrl(i);
+    });
+  }
+
+  function runQueue(list, concurrency) {
+    var idx = 0;
+    function worker() {
+      if (idx >= list.length) return Promise.resolve();
+      var i = list[idx++];
+      return loadFrame(i).then(worker);
+    }
+    var pool = [];
+    for (var k = 0; k < concurrency; k++) pool.push(worker());
+    return Promise.all(pool);
+  }
+
+  var coarse = [], fine = [], i;
+  for (i = 1; i <= TOTAL; i++) (((i - 1) % 6 === 0) ? coarse : fine).push(i);
+
+  /* ---------------------------------------------------------
+     Canvas scrubber
+     --------------------------------------------------------- */
+  var scrolly = root.querySelector('.nsx__scrolly');
+  var stage = root.querySelector('.nsx__stage');
+  var canvas = root.querySelector('.nsx__canvas');
+  var hint = root.querySelector('.nsx__hint');
+  var caps = [].slice.call(root.querySelectorAll('.nsx__cap'));
+  var ctx = canvas ? canvas.getContext('2d', { alpha: false }) : null;
+
+  /* lastFrame = what the scroll position wants.
+     lastDrawn = what is actually on the canvas right now. */
+  var cssW = 0, cssH = 0, dpr = 1, lastFrame = 1, lastDrawn = -1, running = false;
+
+  function sizeCanvas() {
+    if (!canvas) return false;
+    var r = canvas.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return false;
+    var d = Math.min(window.devicePixelRatio || 1, 2);
+    if (r.width === cssW && r.height === cssH && d === dpr) return false;
+    dpr = d; cssW = r.width; cssH = r.height;
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    lastDrawn = -1;
+    return true;
+  }
+
+  function resize() {
+    if (sizeCanvas()) paint(lastFrame);
+  }
+
+  function nearestLoaded(want) {
+    if (imgs[want]) return imgs[want];
+    for (var d = 1; d <= TOTAL; d++) {
+      if (want - d >= 1 && imgs[want - d]) return imgs[want - d];
+      if (want + d <= TOTAL && imgs[want + d]) return imgs[want + d];
+    }
+    return null;
+  }
+
+  function paint(idx) {
+    if (!ctx) return;
+    var img = nearestLoaded(idx);
+    if (!img) return;
+    if (canvas.width < 2 && !sizeCanvas()) return;
+    var cw = canvas.width, ch = canvas.height;
+    var ca = cw / ch, dw, dh;
+    /* cover: fill the canvas box, crop the overflow */
+    if (ca < FRAME_AR) { dh = ch; dw = ch * FRAME_AR; }
+    else { dw = cw; dh = cw / FRAME_AR; }
+    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+  }
+
+  function capStyle(p, from, to) {
+    var IN = 0.055, OUT = 0.075;
+    if (p <= from - IN || p >= to + OUT) return 0;
+    if (p < from) return (p - (from - IN)) / IN;
+    if (p > to) return 1 - (p - to) / OUT;
+    return 1;
+  }
+
+  function tick() {
+    if (!running) return;
+    var r = scrolly.getBoundingClientRect();
+    var runway = scrolly.offsetHeight - stage.offsetHeight;
+    var p = runway > 0 ? clamp(-r.top / runway, 0, 1) : 0;
+
+    var idx = Math.round(p * (TOTAL - 1)) + 1;
+    lastFrame = idx;
+    if (idx !== lastDrawn) { paint(idx); lastDrawn = idx; }
+
+    for (var c = 0; c < caps.length; c++) {
+      var el = caps[c];
+      var o = capStyle(p, parseFloat(el.dataset.from), parseFloat(el.dataset.to));
+      if (el._o !== o) {
+        el.style.opacity = o;
+        el.style.transform = reduced ? '' : 'translate3d(0,' + ((1 - o) * 14).toFixed(1) + 'px,0)';
+        el._o = o;
+      }
+    }
+    if (hint) hint.style.opacity = clamp(1 - p / 0.06, 0, 1);
+
+    requestAnimationFrame(tick);
+  }
+
+  function start() { if (!running) { running = true; requestAnimationFrame(tick); } }
+  function stop() { running = false; }
+
+  if (canvas && ctx) {
+    /* ResizeObserver catches the case where layout is not settled yet on
+       first run (svh units, late fonts) as well as every later resize.
+       On iOS this also covers the URL-bar show/hide reflow. */
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(resize).observe(canvas);
+    }
+    resize();
+    var rt;
+    window.addEventListener('resize', function () {
+      clearTimeout(rt); rt = setTimeout(resize, 150);
+    }, { passive: true });
+    window.addEventListener('orientationchange', function () {
+      setTimeout(resize, 260);
+    });
+    window.addEventListener('load', resize);
+
+    /* only burn rAF while the hero is actually on screen */
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es[0].isIntersecting ? start() : stop();
+      }, { rootMargin: '10% 0px' }).observe(scrolly);
+    } else { start(); }
+
+    loadFrame(1).then(function () {
+      paint(1);
+      return runQueue(coarse, 6);
+    }).then(function () {
+      return runQueue(fine, 6);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     Reveals
+     --------------------------------------------------------- */
+  var rises = [].slice.call(root.querySelectorAll('.nsx__rise'));
+  if ('IntersectionObserver' in window && !reduced) {
+    var ro = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); ro.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    rises.forEach(function (el, n) {
+      el.style.transitionDelay = (n % 3) * 90 + 'ms';
+      ro.observe(el);
+    });
+  } else {
+    rises.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ---------------------------------------------------------
+     Looping film: only play while visible (saves battery, and
+     iOS will not autoplay off-screen video reliably anyway)
+     --------------------------------------------------------- */
+  var vid = root.querySelector('.nsx__playFrame video');
+  if (vid && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { var q = vid.play(); if (q && q.catch) q.catch(function () {}); }
+        else { vid.pause(); }
+      });
+    }, { threshold: 0.25 }).observe(vid);
+  }
+
+  /* ---------------------------------------------------------
+     Checkout
+     --------------------------------------------------------- */
+  function goCheckout(e) {
+    var cfg = NSX_CONFIG.checkout;
+    if (cfg.mode === 'tilda') {
+      e.preventDefault();
+      if (typeof window.tcart__addProduct === 'function') {
+        var t = cfg.tilda;
+        window.tcart__addProduct({
+          id: t.id, name: t.name, price: t.price, quantity: 1,
+          img: /^https?:/.test(t.img) ? t.img : BASE + t.img,
+          url: window.location.href, options: t.options || []
+        });
+      } else {
+        console.warn('[nsx] Tilda cart not found. Add a Store block (ST100/T754) to this page.');
+      }
+      return;
+    }
+    /* mode: 'link' - let the anchor navigate normally */
+    if (!cfg.url || /REPLACE_ME/.test(cfg.url)) {
+      e.preventDefault();
+      console.warn('[nsx] Set NSX_CONFIG.checkout.url before going live.');
+    }
+  }
+
+  [].slice.call(root.querySelectorAll('[data-nsx-buy]')).forEach(function (b) {
+    if (NSX_CONFIG.checkout.mode === 'link' && b.tagName === 'A') {
+      b.setAttribute('href', NSX_CONFIG.checkout.url);
+    }
+    b.addEventListener('click', goCheckout);
+  });
+
+  /* ---------------------------------------------------------
+     Sticky mobile buy dock: appears after the hero, hides once
+     the real buy block is on screen.
+     --------------------------------------------------------- */
+  var dock = root.querySelector('.nsx__dock');
+  var buySection = root.querySelector('#nsx-buy');
+  if (dock && buySection && 'IntersectionObserver' in window) {
+    var pastHero = false, atBuy = false;
+    var sync = function () { dock.classList.toggle('is-on', pastHero && !atBuy); };
+    new IntersectionObserver(function (es) {
+      pastHero = !es[0].isIntersecting; sync();
+    }, { rootMargin: '0px' }).observe(scrolly);
+    new IntersectionObserver(function (es) {
+      atBuy = es[0].isIntersecting; sync();
+    }, { threshold: 0.15 }).observe(buySection);
+  }
+
+  /* expose for quick console tweaking */
+  window.NSX_CONFIG = NSX_CONFIG;
+})();
+
+</script>

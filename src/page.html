@@ -1,0 +1,224 @@
+<!-- =========================================================
+     NINA SECHKO x ROBINEAU - product page (RU)
+     All wording lives in this file. Anything tagged REPLACE in a
+     trailing comment is placeholder text awaiting the real copy.
+     House rule: no "e with diaeresis" anywhere in the Russian.
+     {{BASE}} is rewritten by build.py to the asset host.
+     ========================================================= -->
+<div class="nsx">
+
+  <noscript><style>
+    /* without JS there is no scrub, so collapse the runway to one screen
+       and pin the opening caption */
+    .nsx__scrolly{height:100vh;height:100svh}
+    .nsx__cap--intro{opacity:1!important}
+    .nsx__hint{display:none}
+  </style></noscript>
+
+  <!-- ============ 1. SCROLL-SCRUB HERO ============ -->
+  <section class="nsx__scrolly" id="nsx-open" aria-label="Коробка открывается">
+    <div class="nsx__stage">
+
+      <canvas class="nsx__canvas"
+              role="img"
+              aria-label="Собранная вручную коробка раскрывается, и из нее вылетает колода карт с картинами"
+              style="background:#ECEDF1 url('{{BASE}}/media/poster.webp') center/cover no-repeat"></canvas>
+
+      <div class="nsx__scrim" aria-hidden="true"></div>
+
+      <div class="nsx__meter" aria-hidden="true"><span class="nsx__meterFill"></span></div>
+
+      <div class="nsx__caps">
+
+        <div class="nsx__cap nsx__cap--intro" data-from="0.00" data-to="0.15" style="opacity:1">
+          <p class="nsx__eyebrow">ROBINEAU &times; НИНА СЕЧКО</p>
+          <h1 class="nsx__title">Мемори</h1><!-- REPLACE: название продукта -->
+          <p class="nsx__capText">Коллекционное издание: живопись, в которую играют.</p><!-- REPLACE -->
+        </div>
+
+        <div class="nsx__cap" data-from="0.26" data-to="0.42">
+          <p class="nsx__eyebrow">Коробка</p>
+          <p class="nsx__capText">Собрана вручную и раскрывается сразу на четыре стороны.</p><!-- REPLACE -->
+        </div>
+
+        <div class="nsx__cap" data-from="0.54" data-to="0.70">
+          <p class="nsx__eyebrow">Внутри</p>
+          <p class="nsx__capText">Полная колода, напечатанная с оригинальных работ.</p><!-- REPLACE -->
+        </div>
+
+        <div class="nsx__cap" data-from="0.85" data-to="1.00">
+          <p class="nsx__eyebrow">Игра</p>
+          <p class="nsx__capText">Переверните две карты. Найдите пару. Заберите картину.</p><!-- REPLACE -->
+        </div>
+
+      </div>
+
+      <div class="nsx__hint" aria-hidden="true">
+        <span>Листайте</span>
+        <span class="nsx__hintBar"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. STATEMENT ============ -->
+  <section class="nsx__section nsx__statement">
+    <p class="nsx__eyebrow nsx__rise">Издание</p>
+    <h2 class="nsx__h2 nsx__lead nsx__rise">Галерейное издание, которое ведет себя как игрушка.</h2><!-- REPLACE -->
+    <p class="nsx__body nsx__rise">
+      Живопись Нины Сечко исследует созерцание себя &mdash; интимно, игриво и с тихой иронией по
+      отношению к миру природы. Ее визуальные источники &mdash; комиксы, аниме и иллюстрированные
+      книги русского детства. Это издание собирает те же образы в колоду, а колоду &mdash; в коробку,
+      которая раскрывается как бумажная инженерия.
+    </p><!-- REPLACE: полное описание продукта -->
+  </section>
+
+  <!-- ============ 3. HOW IT PLAYS ============ -->
+  <section class="nsx__section">
+    <div class="nsx__play">
+      <div class="nsx__playFrame nsx__rise">
+        <video
+          src="{{BASE}}/media/play.mp4"
+          poster="{{BASE}}/media/still-spread.webp"
+          muted playsinline loop preload="metadata"
+          disablepictureinpicture
+          aria-label="Карты разложены и разыгрываются как игра на память"></video>
+      </div>
+      <div class="nsx__playCopy">
+        <p class="nsx__eyebrow nsx__rise">Как играть</p>
+        <h2 class="nsx__h2 nsx__rise">Переверните две.<br>Найдите пару.</h2><!-- REPLACE -->
+        <p class="nsx__body nsx__rise">
+          Разложите карты рубашкой вверх. Переворачивайте по две за ход. Совпала картина со своей
+          парой &mdash; пара ваша. От двух до шести игроков, десять минут на партию, читать не нужно
+          &mdash; поэтому это в равной мере детская игра и предмет коллекционера.
+        </p><!-- REPLACE: проверьте правила -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. WHAT ARRIVES ============ -->
+  <section class="nsx__section">
+    <p class="nsx__eyebrow nsx__rise" style="margin-bottom:clamp(28px,5vw,48px)">Что вы получите</p>
+    <div class="nsx__grid">
+
+      <div class="nsx__card nsx__rise">
+        <figure>
+          <img src="{{BASE}}/media/still-open.webp" alt="Раскрытая коробка" loading="lazy" decoding="async" width="900" height="1600">
+          <figcaption>
+            <h3 class="nsx__h3">Коробка</h3><!-- REPLACE -->
+            <p>Собрана вручную, раскрывается на четыре стороны, со всех сторон напечатана работами художницы.</p><!-- REPLACE -->
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="nsx__card nsx__rise">
+        <figure>
+          <img src="{{BASE}}/media/still-spread.webp" alt="Разложенные карты с картинами" loading="lazy" decoding="async" width="900" height="1600">
+          <figcaption>
+            <h3 class="nsx__h3">Картины</h3><!-- REPLACE -->
+            <p>Работы, воспроизведенные с оригиналов; каждая встречается в колоде дважды.</p><!-- REPLACE -->
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="nsx__card nsx__rise">
+        <figure>
+          <img src="{{BASE}}/media/still-backs.webp" alt="Рубашка карт" loading="lazy" decoding="async" width="900" height="1600">
+          <figcaption>
+            <h3 class="nsx__h3">Рубашка</h3><!-- REPLACE -->
+            <p>Единое непрерывное изображение на обороте каждой карты, с подписью художницы.</p><!-- REPLACE -->
+          </figcaption>
+        </figure>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 5. SPECIFICATION ============ -->
+  <section class="nsx__section">
+    <p class="nsx__eyebrow nsx__rise">Характеристики</p>
+    <h2 class="nsx__h2 nsx__rise" style="margin-top:.4em">Детали</h2>
+
+    <dl class="nsx__specs nsx__rise"><!-- REPLACE: все значения ниже -->
+      <div class="nsx__spec"><dt>Художник</dt><dd>Нина Сечко (р. 1992, Москва)</dd></div>
+      <div class="nsx__spec"><dt>Тираж</dt><dd>Лимитированный тираж 000, нумерованный</dd></div>
+      <div class="nsx__spec"><dt>Состав</dt><dd>00 карт / 00 картин, каждая парой</dd></div>
+      <div class="nsx__spec"><dt>Размер карты</dt><dd>00 &times; 00 мм, 000 г/м&sup2;</dd></div>
+      <div class="nsx__spec"><dt>Коробка</dt><dd>00 &times; 00 &times; 00 мм, ручная сборка</dd></div>
+      <div class="nsx__spec"><dt>Игроки</dt><dd>2&ndash;6, от 0 лет</dd></div>
+      <div class="nsx__spec"><dt>Издатель</dt><dd>ROBINEAU</dd></div>
+    </dl>
+  </section>
+
+  <!-- ============ 6. BUY ============ -->
+  <section class="nsx__section" id="nsx-buy">
+    <div class="nsx__buy nsx__rise">
+
+      <div class="nsx__buyMedia">
+        <img src="{{BASE}}/media/still-backs.webp" alt="Рубашка карт" loading="lazy" decoding="async" width="900" height="1600">
+      </div>
+
+      <div>
+        <p class="nsx__eyebrow">Заказ</p>
+        <h2 class="nsx__h2" style="margin-top:.35em;font-size:clamp(26px,5.4vw,40px)">
+          Мемори
+        </h2><!-- REPLACE: название продукта -->
+
+        <!-- Artist name lockup: Barlow Regular, caps, two literal spaces.
+             Kept in Latin because Barlow has no Cyrillic at all - a Cyrillic
+             lockup here would silently fall back to a system font. -->
+        <p class="nsx__lockup" style="margin-top:1.1em">N&nbsp;&nbsp;I&nbsp;&nbsp;N&nbsp;&nbsp;A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S&nbsp;&nbsp;E&nbsp;&nbsp;C&nbsp;&nbsp;H&nbsp;&nbsp;K&nbsp;&nbsp;O</p>
+
+        <div class="nsx__price">
+          <span class="nsx__priceNow">4&nbsp;500&nbsp;&#8381;</span><!-- REPLACE: цена -->
+          <span class="nsx__priceNote">Доставка включена</span><!-- REPLACE -->
+        </div>
+
+        <a class="nsx__btn" data-nsx-buy href="#" role="button">В корзину</a><!-- REPLACE: текст кнопки -->
+
+        <p class="nsx__reassure">
+          Отправка в течение 3 рабочих дней &middot; С отслеживанием &middot; Возврат в течение 14 дней
+        </p><!-- REPLACE -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 7. FOOTER ============ -->
+  <footer class="nsx__footer">
+    <div class="nsx__footGrid">
+
+      <div>
+        <h3>Международные коммуникации</h3>
+        <p>Патрик Робино</p>
+        <a href="mailto:patrick@robineauart.com">patrick@robineauart.com</a>
+        <a href="tel:+79266806626">+7 926 680-66-26</a>
+      </div>
+
+      <div>
+        <h3>Русские и китайские коммуникации</h3>
+        <p>Валентина Робино</p>
+        <a href="mailto:valentina@robineauart.com">valentina@robineauart.com</a>
+        <a href="tel:+79143382234">+7 914 338-22-34</a>
+      </div>
+
+      <div>
+        <h3>ROBINEAU</h3>
+        <a href="https://www.robineauart.com" target="_blank" rel="noopener">robineauart.com</a>
+        <a href="https://www.instagram.com/robineau_gallery" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://t.me/robineauart" target="_blank" rel="noopener">Telegram</a>
+      </div>
+
+    </div>
+
+    <p class="nsx__colophon">
+      &copy; ROBINEAU. Работы &copy; Нина Сечко. Кураторство на пересечении традиции и технологии,
+      улавливая дух нашего времени.
+    </p>
+  </footer>
+
+  <!-- sticky buy bar, phones only -->
+  <div class="nsx__dock">
+    <a class="nsx__btn" data-nsx-buy href="#" role="button">В корзину &mdash; 4&nbsp;500&nbsp;&#8381;</a><!-- REPLACE -->
+  </div>
+
+</div>
