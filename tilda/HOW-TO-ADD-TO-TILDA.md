@@ -44,12 +44,32 @@ studio backdrop so the frames sit *on* the page rather than on top of it.
 Your page uses white and `#F2F2F2` for its sections, so the grey reads as its
 own section — which looks intentional and gives the animation room to breathe.
 
-If you'd rather it matched the block above or below exactly, change one line
-near the top of the pasted code:
+If you'd rather it matched the block above or below exactly, change these two
+lines near the top of the pasted code — **both**, they have to agree:
 
 ```css
---ground:#ECEDF1;     /* try #FFFFFF or #F2F2F2 */
+--ground:#ECEDF1;
+--ground-rgb:236,237,241;    /* the same colour, written as r,g,b */
 ```
+
+(For white that's `#FFFFFF` and `255,255,255`. For Tilda's grey, `#F2F2F2` and
+`242,242,242`.)
+
+### How far the picture blends into the page
+
+The bottom edge of the frame dissolves into the background so the box looks like
+it is sitting on the page rather than inside a rectangle. Two settings control
+how far that reaches:
+
+```css
+--fade-y:17%;    /* up from the bottom edge */
+--fade-x:6%;     /* in from the left and right edges, wide screens only */
+```
+
+Bigger numbers give a softer join but wash out more of the picture. These are
+deliberately short: when the cards burst out they fly to all four edges of the
+frame, so a long fade starts eating the cards. Anything past about `25%` on
+`--fade-y` becomes visible as haze over the box itself.
 
 ---
 

@@ -12,8 +12,18 @@
      white (#FFFFFF) and #F2F2F2 both look fine too - just change the
      three values on this line and the two below it.                      */
   --ground:#ECEDF1;
+  --ground-rgb:236,237,241;   /* same colour as --ground, in r,g,b form */
   --ground-hi:#F5F6FA;
   --ground-lo:#E1E2E9;
+
+  /* ===== HOW FAR THE FRAME BLENDS INTO THE PAGE =====
+     --fade-y  how far up from the bottom edge the blend reaches
+     --fade-x  how far in from the left and right edges (wide screens only)
+     Bigger = softer join but more of the picture washed out. These are
+     deliberately short: during the card burst the artwork reaches all
+     four edges, so a long fade eats into it. */
+  --fade-y:17%;
+  --fade-x:6%;
   --ink:#16161A;
   --ink-soft:#5D5D68;
   --ink-mid:#33333C;
@@ -66,11 +76,7 @@
 
 /* The canvas is a centred 9:16 box. On a phone it is wider than the screen,
    so the frame covers edge to edge. On desktop it settles to exactly 9:16
-   and the studio ground either side is the page itself.
-
-   NOTE: no edge mask and no bottom scrim. During the card burst the artwork
-   reaches all four edges of the frame, so any fade clips it. The seam is
-   handled by matching the page ground to the film's backdrop instead. */
+   and the studio ground either side is the page itself. */
 .nsx__canvas{
   position:absolute;
   top:0;
@@ -80,6 +86,30 @@
   height:100svh;
   width:min(100%,calc(100vh * 0.5625));
   width:min(100%,calc(100svh * 0.5625));
+}
+@media (min-width:860px){
+  /* Feather the vertical edges so the frame dissolves into the page
+     instead of ending on a hard line. Only on wide screens - on a phone
+     the frame is full-bleed and has no side edges to hide. */
+  .nsx__canvas{
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-x),#000 calc(100% - var(--fade-x)),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-x),#000 calc(100% - var(--fade-x)),transparent 100%);
+  }
+}
+
+/* Bottom blend: dissolves the foot of the frame into the page. Kept short
+   so it grounds the box without washing over it. Caption legibility is
+   handled separately by the glyph halo below, so this does not have to
+   reach far enough to sit behind the text. */
+.nsx__scrim{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(to top,
+    rgba(var(--ground-rgb),.97) 0%,
+    rgba(var(--ground-rgb),.80) calc(var(--fade-y) * 0.30),
+    rgba(var(--ground-rgb),.36) calc(var(--fade-y) * 0.64),
+    rgba(var(--ground-rgb),0)   var(--fade-y));
 }
 
 /* ---------- captions (optional) ---------- */

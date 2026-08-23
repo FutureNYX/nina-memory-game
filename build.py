@@ -43,8 +43,10 @@ FONT_LINK = (
 
 def build(base_standalone, base_tilda):
     page = read('page.html')
-    css = read('style.css')
-    js = read('app.js')
+    # hero.css / hero.js are the single source of truth for the animation;
+    # style.css and app.js only add the sections below it.
+    css = read('hero.css') + '\n' + read('style.css')
+    js = read('hero.js') + '\n' + read('app.js')
 
     # ---------- standalone index.html ----------
     body = page.replace('{{BASE}}', base_standalone)
