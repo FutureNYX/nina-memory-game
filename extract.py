@@ -26,7 +26,12 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 SEQ_START, SEQ_DUR, FPS = 0.0, 9.60, 15
-W, H = 756, 1344
+
+# Two resolutions. The player picks one at runtime from cssWidth x DPR:
+#   frames/     756px  - low-DPR phones and non-retina desktops
+#   frames-hi/ 1080px  - the source's own resolution, for 3x phones and
+#                        retina desktops, where 756 visibly softens
+SIZES = [(756, 1344, 'frames'), (1080, 1920, 'frames-hi')]
 DROP = set(range(56, 62))     # the light-leak transition
 KEEP_UNTIL = 129              # sampled-frame index; 123 survive after DROP
 
@@ -41,30 +46,36 @@ def run(*args):
 
 
 def main(src):
-    frames = os.path.join(HERE, 'frames')
     media = os.path.join(HERE, 'media')
     tmp = os.path.join(HERE, '_raw')
-    for d in (frames, media, tmp):
+    for d in (media, tmp):
         if not os.path.isdir(d):
             os.makedirs(d)
-    for f in os.listdir(frames):
-        os.remove(os.path.join(frames, f))
-    for f in os.listdir(tmp):
-        os.remove(os.path.join(tmp, f))
-
-    print('sampling sequence...')
-    run('-ss', str(SEQ_START), '-t', str(SEQ_DUR), '-i', src,
-        '-vf', 'fps=%d,scale=%d:%d:flags=lanczos' % (FPS, W, H),
-        '-c:v', 'libwebp', '-quality', '72', '-compression_level', '6',
-        '-preset', 'photo', os.path.join(tmp, 'r_%03d.webp'))
 
     n = 0
-    for i in range(1, KEEP_UNTIL + 1):
-        srcf = os.path.join(tmp, 'r_%03d.webp' % i)
-        if i in DROP or not os.path.exists(srcf):
-            continue
-        n += 1
-        os.replace(srcf, os.path.join(frames, 'f_%03d.webp' % n))
+    for W, H, outdir in SIZES:
+        frames = os.path.join(HERE, outdir)
+        if not os.path.isdir(frames):
+            os.makedirs(frames)
+        for f in os.listdir(frames):
+            os.remove(os.path.join(frames, f))
+        for f in os.listdir(tmp):
+            os.remove(os.path.join(tmp, f))
+
+        print('sampling sequence at %dpx...' % W)
+        run('-ss', str(SEQ_START), '-t', str(SEQ_DUR), '-i', src,
+            '-vf', 'fps=%d,scale=%d:%d:flags=lanczos' % (FPS, W, H),
+            '-c:v', 'libwebp', '-quality', '72', '-compression_level', '6',
+            '-preset', 'photo', os.path.join(tmp, 'r_%03d.webp'))
+
+        n = 0
+        for i in range(1, KEEP_UNTIL + 1):
+            srcf = os.path.join(tmp, 'r_%03d.webp' % i)
+            if i in DROP or not os.path.exists(srcf):
+                continue
+            n += 1
+            os.replace(srcf, os.path.join(frames, 'f_%03d.webp' % n))
+
     for f in os.listdir(tmp):
         os.remove(os.path.join(tmp, f))
     os.rmdir(tmp)
@@ -78,7 +89,7 @@ def main(src):
 
     print('poster, og, stills...')
     run('-ss', '0', '-i', src, '-frames:v', '1',
-        '-vf', 'scale=%d:%d:flags=lanczos' % (W, H),
+        '-vf', 'scale=756:1344:flags=lanczos',
         '-c:v', 'libwebp', '-quality', '88', os.path.join(media, 'poster.webp'))
     run('-ss', '2.9', '-i', src, '-frames:v', '1',
         '-vf', 'scale=1200:-2:flags=lanczos,crop=1200:630',
