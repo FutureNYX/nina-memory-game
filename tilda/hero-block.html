@@ -1,0 +1,467 @@
+<!-- ===========================================================
+     NINA SECHKO x ROBINEAU - the box-opening animation
+     version WITH the four timed captions
+
+     PASTE ALL OF THIS INTO ONE TILDA BLOCK:
+       Библиотека блоков -> Другое -> T123 "HTML-код"
+
+     Set your Tilda page background to #ECEDF1 so the block blends
+     into the page above and below it.
+
+     Frames are served from:
+       https://futurenyx.github.io/nina-memory-game
+     Tilda cannot host them - that is Tilda's own rule, not a
+     workaround. See the README.
+     =========================================================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&display=swap">
+
+<style>
+/* let the block escape Tilda's 960px container */
+.t-rec .t123__wrapper,.t123 .t-container,.t123 .t-col{max-width:100%!important;padding:0!important;margin:0!important}
+/* ============================================================
+   NINA SECHKO x ROBINEAU - scroll-opening hero
+   Self-contained. Everything is namespaced under .nsx so it
+   cannot collide with Tilda's own styles.
+   ============================================================ */
+.nsx *,.nsx *::before,.nsx *::after{box-sizing:border-box}
+.nsx{
+  /* Ground. Sampled off the film's studio backdrop so the frames sit on
+     the page rather than on top of it. Set your Tilda page background to
+     --ground (#ECEDF1) and the seam disappears. */
+  --ground:#ECEDF1;
+  --ground-hi:#F5F6FA;
+  --ground-lo:#E1E2E9;
+  --ink:#16161A;
+  --ink-soft:#5D5D68;
+  --ink-mid:#33333C;
+  --ink-faint:#9B9BA6;
+
+  --sans:"Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --pad:clamp(20px,5.5vw,64px);
+
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--ground);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  /* clip, NOT hidden - overflow:hidden on an ancestor kills position:sticky,
+     which is the whole mechanism here. */
+  overflow-x:clip;
+}
+.nsx canvas{display:block;max-width:100%}
+.nsx p{margin:0}
+.nsx h1{margin:0;font-weight:400;line-height:1.06}
+
+/* ---------- the scroll runway ----------
+   Taller = the box opens more slowly as you scroll. This is the one number
+   worth playing with: 400svh means four screens of scrolling to open it. */
+.nsx__scrolly{
+  position:relative;
+  height:400vh;    /* fallback for browsers without svh */
+  height:400svh;
+  background:radial-gradient(120% 78% at 50% 42%,var(--ground-hi) 0%,var(--ground) 55%,var(--ground-lo) 100%);
+}
+@media (min-width:860px){.nsx__scrolly{height:520vh;height:520svh}}
+@media (max-width:520px){.nsx__scrolly{height:360vh;height:360svh}}
+
+.nsx__stage{
+  position:sticky;
+  top:0;
+  /* svh (not vh / dvh) so the iOS URL bar collapsing never resizes the
+     stage mid-scroll - that is the classic cause of jitter. */
+  height:100vh;
+  height:100svh;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+}
+
+/* The canvas is a centred 9:16 box. On a phone it is wider than the screen,
+   so the frame covers edge to edge. On desktop it settles to exactly 9:16
+   and the studio ground either side is the page itself.
+
+   NOTE: no edge mask and no bottom scrim. During the card burst the artwork
+   reaches all four edges of the frame, so any fade clips it. The seam is
+   handled by matching the page ground to the film's backdrop instead. */
+.nsx__canvas{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  height:100vh;
+  height:100svh;
+  width:min(100%,calc(100vh * 0.5625));
+  width:min(100%,calc(100svh * 0.5625));
+}
+
+/* ---------- captions (optional) ---------- */
+.nsx__caps{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  padding:var(--pad);
+  padding-left:calc(var(--pad) + env(safe-area-inset-left,0px));
+  padding-right:calc(var(--pad) + env(safe-area-inset-right,0px));
+  display:grid;
+}
+.nsx__cap{
+  grid-area:1/1;
+  align-self:end;
+  justify-self:start;
+  max-width:min(30ch,94%);
+  opacity:0;
+  will-change:opacity,transform;
+  padding-bottom:clamp(52px,10vh,84px);
+}
+.nsx__cap > * + *{margin-top:.7em}
+
+/* Legibility without a scrim: a soft halo of the ground colour around the
+   glyphs themselves. Costs nothing where the frame is empty, and only
+   touches the pixels immediately behind the type where it is not. */
+.nsx__cap p,.nsx__cap h1{
+  text-shadow:
+    0 0 8px rgba(236,237,241,.95),
+    0 0 18px rgba(236,237,241,.85),
+    0 0 34px rgba(236,237,241,.6);
+}
+
+@media (min-width:860px){
+  /* wide screens: captions leave the frame and sit in the left gutter */
+  .nsx__cap{align-self:center;padding-bottom:0;max-width:min(32ch,32%)}
+  .nsx__cap p,.nsx__cap h1{text-shadow:none}
+}
+
+.nsx__eyebrow{
+  font-size:clamp(10px,2.5vw,12px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  font-weight:500;
+}
+.nsx__title{
+  font-size:clamp(44px,13vw,112px);
+  line-height:.94;
+  letter-spacing:-.038em;
+  font-weight:400;
+}
+.nsx__capText{
+  font-size:clamp(16px,4.2vw,21px);
+  line-height:1.45;
+  color:var(--ink-mid);
+  max-width:24ch;
+}
+
+/* ---------- scroll hint ---------- */
+.nsx__hint{
+  position:absolute;
+  right:calc(var(--pad) + env(safe-area-inset-right,0px));
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:.8em;
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  pointer-events:none;
+  will-change:opacity;
+}
+.nsx__hintBar{
+  display:block;width:1px;height:34px;
+  background:linear-gradient(var(--ink-faint),transparent);
+}
+@media (prefers-reduced-motion:no-preference){
+  .nsx__hintBar{animation:nsxDrop 2.1s ease-in-out infinite}
+}
+@keyframes nsxDrop{
+  0%,100%{transform:scaleY(.35);transform-origin:top;opacity:.35}
+  50%{transform:scaleY(1);transform-origin:top;opacity:1}
+}
+@media (min-width:860px){
+  .nsx__hint{left:50%;right:auto;transform:translateX(-50%);align-items:center}
+}
+
+/* ---------- loading meter ---------- */
+.nsx__meter{position:absolute;left:0;top:0;height:2px;width:100%;pointer-events:none}
+.nsx__meterFill{
+  height:100%;width:0%;
+  background:#D9674F;
+  transition:width .3s linear,opacity .6s .4s;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .nsx__hintBar{animation:none}
+}
+</style>
+
+<!-- =========================================================
+     THE BOX-OPENING ANIMATION
+     Drop this into one Tilda "T123 / HTML-код" block.
+
+     TO REMOVE A CAPTION: delete the whole <div class="nsx__cap">...</div>
+     block. They are independent - remove one, some, or all of them.
+     TO REMOVE ALL TEXT: delete everything between
+     <div class="nsx__caps"> and its closing </div>, and the nsx__hint block.
+
+     data-from / data-to are positions in the scroll, 0 = box closed,
+     1 = cards fully out. Change them to re-time when text appears.
+     ========================================================= -->
+<div class="nsx">
+  <section class="nsx__scrolly" aria-label="Коробка открывается">
+    <div class="nsx__stage">
+
+      <canvas class="nsx__canvas"
+              role="img"
+              aria-label="Собранная вручную коробка раскрывается, и из нее вылетает колода карт с картинами"
+              style="background:#ECEDF1 url('https://futurenyx.github.io/nina-memory-game/media/poster.webp') center/cover no-repeat"></canvas>
+
+      <div class="nsx__meter" aria-hidden="true"><span class="nsx__meterFill"></span></div>
+
+      <div class="nsx__caps">
+        <!-- caption 1 - shows while the box is still closed -->
+        <div class="nsx__cap" data-from="0.00" data-to="0.15" style="opacity:1">
+          <p class="nsx__eyebrow">ROBINEAU &times; НИНА СЕЧКО</p>
+          <h1 class="nsx__title">Мемори</h1>
+          <p class="nsx__capText">Коллекционное издание: живопись, в которую играют.</p>
+        </div>
+
+        <!-- caption 2 - as the box splits open -->
+        <div class="nsx__cap" data-from="0.26" data-to="0.42">
+          <p class="nsx__eyebrow">Коробка</p>
+          <p class="nsx__capText">Собрана вручную и раскрывается сразу на четыре стороны.</p>
+        </div>
+
+        <!-- caption 3 - box lying open -->
+        <div class="nsx__cap" data-from="0.54" data-to="0.70">
+          <p class="nsx__eyebrow">Внутри</p>
+          <p class="nsx__capText">Полная колода, напечатанная с оригинальных работ.</p>
+        </div>
+
+        <!-- caption 4 - as the cards burst out -->
+        <div class="nsx__cap" data-from="0.85" data-to="1.00">
+          <p class="nsx__eyebrow">Игра</p>
+          <p class="nsx__capText">Переверните две карты. Найдите пару. Заберите картину.</p>
+        </div>
+      </div>
+
+      <div class="nsx__hint" aria-hidden="true">
+        <span>Листайте</span>
+        <span class="nsx__hintBar"></span>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<script>
+/* ============================================================
+   NINA SECHKO x ROBINEAU - scroll-opening hero
+
+   Scrubs a 123-frame image sequence with the scroll position.
+   It is NOT a video: scrubbing video.currentTime on iOS Safari
+   judders, because Safari only repaints when a seek completes.
+
+   The only thing you normally need to touch is NSX_HERO.assetBase.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var NSX_HERO = {
+    /* Where the frames live. Must be an https:// base with a /frames
+       folder under it. Tilda cannot host these - see the README. */
+    assetBase: 'https://futurenyx.github.io/nina-memory-game',
+    frameCount: 123,
+    framePrefix: '/frames/f_',
+    frameExt: '.webp'
+  };
+
+  /* ---------------------------------------------------------- */
+
+  var root = document.querySelector('.nsx');
+  if (!root) return;
+
+  var BASE = (NSX_HERO.assetBase || '.').replace(/\/$/, '');
+  var TOTAL = NSX_HERO.frameCount;
+  var FRAME_AR = 756 / 1344;
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+  function frameUrl(i) {
+    /* the self-contained preview build inlines every frame as a data URI */
+    if (window.NSX_FRAMES) return window.NSX_FRAMES[i - 1];
+    var n = String(i);
+    while (n.length < 3) n = '0' + n;
+    return BASE + NSX_HERO.framePrefix + n + NSX_HERO.frameExt;
+  }
+
+  /* ---------------------------------------------------------
+     Frame loading, in two passes.
+     Pass 1 grabs every 6th frame, so the sequence is scrubbable
+     after ~440 KB instead of the full 2.7 MB. Pass 2 fills the
+     gaps in. The scrubber always draws the nearest frame it
+     actually has, so it degrades rather than stalling.
+     --------------------------------------------------------- */
+  var imgs = new Array(TOTAL + 1);
+  var loadedCount = 0;
+  var meterFill = root.querySelector('.nsx__meterFill');
+
+  function bumpMeter() {
+    if (!meterFill) return;
+    var pct = Math.round((loadedCount / TOTAL) * 100);
+    meterFill.style.width = pct + '%';
+    if (pct >= 100) meterFill.style.opacity = '0';
+  }
+
+  function loadFrame(i, attempt) {
+    return new Promise(function (resolve) {
+      if (imgs[i]) return resolve();
+      var im = new Image();
+      im.decoding = 'async';
+      im.onload = function () {
+        imgs[i] = im; loadedCount++; bumpMeter();
+        if (i === lastFrame) lastDrawn = -1;   /* sharper frame arrived */
+        resolve();
+      };
+      im.onerror = function () {
+        /* CDNs throttle a burst of 123 requests and phones drop off
+           mid-scroll. Retry twice before giving up. */
+        var n = attempt || 0;
+        if (n < 2) {
+          setTimeout(function () { resolve(loadFrame(i, n + 1)); }, 400 * (n + 1));
+          return;
+        }
+        loadedCount++; bumpMeter(); resolve();
+      };
+      im.src = frameUrl(i) + (attempt && !window.NSX_FRAMES ? '?r=' + attempt : '');
+    });
+  }
+
+  function runQueue(list, concurrency) {
+    var idx = 0;
+    function worker() {
+      if (idx >= list.length) return Promise.resolve();
+      return loadFrame(list[idx++]).then(worker);
+    }
+    var pool = [];
+    for (var k = 0; k < concurrency; k++) pool.push(worker());
+    return Promise.all(pool);
+  }
+
+  var coarse = [], fine = [], i;
+  for (i = 1; i <= TOTAL; i++) (((i - 1) % 6 === 0) ? coarse : fine).push(i);
+
+  /* ---------------------------------------------------------
+     Canvas scrubber
+     --------------------------------------------------------- */
+  var scrolly = root.querySelector('.nsx__scrolly');
+  var stage = root.querySelector('.nsx__stage');
+  var canvas = root.querySelector('.nsx__canvas');
+  var hint = root.querySelector('.nsx__hint');
+  var caps = [].slice.call(root.querySelectorAll('.nsx__cap'));
+  var ctx = canvas ? canvas.getContext('2d', { alpha: false }) : null;
+  if (!scrolly || !stage || !ctx) return;
+
+  var cssW = 0, cssH = 0, dpr = 1, lastFrame = 1, lastDrawn = -1, running = false;
+
+  function sizeCanvas() {
+    var r = canvas.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return false;
+    var d = Math.min(window.devicePixelRatio || 1, 2);
+    if (r.width === cssW && r.height === cssH && d === dpr) return false;
+    dpr = d; cssW = r.width; cssH = r.height;
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    lastDrawn = -1;
+    return true;
+  }
+
+  function resize() { if (sizeCanvas()) paint(lastFrame); }
+
+  function nearestLoaded(want) {
+    if (imgs[want]) return imgs[want];
+    for (var d = 1; d <= TOTAL; d++) {
+      if (want - d >= 1 && imgs[want - d]) return imgs[want - d];
+      if (want + d <= TOTAL && imgs[want + d]) return imgs[want + d];
+    }
+    return null;
+  }
+
+  function paint(idx) {
+    var img = nearestLoaded(idx);
+    if (!img) return;
+    if (canvas.width < 2 && !sizeCanvas()) return;
+    var cw = canvas.width, ch = canvas.height;
+    var dw, dh;
+    if (cw / ch < FRAME_AR) { dh = ch; dw = ch * FRAME_AR; }
+    else { dw = cw; dh = cw / FRAME_AR; }
+    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+  }
+
+  function capOpacity(p, from, to) {
+    var IN = 0.055, OUT = 0.075;
+    if (p <= from - IN || p >= to + OUT) return 0;
+    if (p < from) return (p - (from - IN)) / IN;
+    if (p > to) return 1 - (p - to) / OUT;
+    return 1;
+  }
+
+  function tick() {
+    if (!running) return;
+    var r = scrolly.getBoundingClientRect();
+    var runway = scrolly.offsetHeight - stage.offsetHeight;
+    var p = runway > 0 ? clamp(-r.top / runway, 0, 1) : 0;
+
+    var idx = Math.round(p * (TOTAL - 1)) + 1;
+    lastFrame = idx;
+    if (idx !== lastDrawn) { paint(idx); lastDrawn = idx; }
+
+    for (var c = 0; c < caps.length; c++) {
+      var el = caps[c];
+      var o = capOpacity(p, parseFloat(el.getAttribute('data-from')),
+                            parseFloat(el.getAttribute('data-to')));
+      if (el._o !== o) {
+        el.style.opacity = o;
+        el.style.transform = reduced ? '' : 'translate3d(0,' + ((1 - o) * 14).toFixed(1) + 'px,0)';
+        el._o = o;
+      }
+    }
+    if (hint) hint.style.opacity = clamp(1 - p / 0.06, 0, 1);
+
+    requestAnimationFrame(tick);
+  }
+
+  /* ResizeObserver catches layout not being settled on first run (svh
+     units, late fonts) as well as every later resize. On iOS it also
+     covers the URL-bar show/hide reflow. */
+  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(canvas);
+  resize();
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt); rt = setTimeout(resize, 150);
+  }, { passive: true });
+  window.addEventListener('orientationchange', function () { setTimeout(resize, 260); });
+  window.addEventListener('load', resize);
+
+  /* only burn rAF while the hero is actually on screen */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      running = es[0].isIntersecting;
+      if (running) requestAnimationFrame(tick);
+    }, { rootMargin: '10% 0px' }).observe(scrolly);
+  } else {
+    running = true; requestAnimationFrame(tick);
+  }
+
+  loadFrame(1)
+    .then(function () { paint(1); return runQueue(coarse, 6); })
+    .then(function () { return runQueue(fine, 6); });
+})();
+</script>

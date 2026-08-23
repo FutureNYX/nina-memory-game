@@ -15,7 +15,17 @@ Tilda block points at.
 ## What's here
 
 ```
-src/page.html        the markup — ALL the wording lives here
+tilda/hero-block.html        ← THE DELIVERABLE: animation + captions
+tilda/hero-block-plain.html  ← same, no text at all
+tilda/HOW-TO-ADD-TO-TILDA.md forwardable instructions, written for a
+                             Tilda user rather than a developer
+
+src/hero.html        hero markup
+src/hero.css         hero styles
+src/hero.js          the scrub engine
+build_hero.py        builds the two blocks above
+
+src/page.html        the markup for the FULL demo page — all wording lives here
 src/style.css        the design
 src/app.js           the scrub engine + checkout wiring
 build.py             assembles the two deliverables below
@@ -38,6 +48,43 @@ Preview locally:
 ```bash
 python -m http.server 8765 --directory nina-cards
 ```
+
+---
+
+## Scope
+
+Elijah's collaborator has already built the Tilda site and wants **only the
+box-opening animation** plus the page background; the product copy, cart and
+payment button stay as native Tilda blocks. So the deliverable is
+`tilda/hero-block.html` — one self-contained paste, **16.6 KB against Tilda's
+100 000-byte block limit**.
+
+The full page (`index.html`, `tilda/tilda-block.html`) still builds and is still
+deployed; treat it as a reference design rather than the thing being shipped.
+
+---
+
+## No scrim, no edge mask — deliberately
+
+The first version faded the frame into the page: a gradient along the bottom so
+caption text stayed readable, and a soft feather down the left and right edges
+on desktop to hide the seam. Both were wrong, and measurably so.
+
+Sampling the content bounding box across the sequence shows the artwork reaching
+**0.0%% to 99.5%% horizontally and 99.7%% down** during the card burst — the
+cards fly off all four edges of the frame. So there is no safe margin: *any*
+fade clips the artwork at some point in the scroll. It looked like white haze
+washing over the box.
+
+Both are gone. Instead:
+
+- **Caption legibility** comes from a halo of the ground colour around the
+  glyphs themselves (`text-shadow`), which only touches the pixels immediately
+  behind the type. On desktop the captions sit outside the frame entirely, so
+  the halo is switched off there.
+- **The seam** is handled by matching the page ground to the film's backdrop.
+  The frame edges average about `#E9EAF1`; the page is `#ECEDF1`. Close enough
+  that the join reads as one surface.
 
 ---
 

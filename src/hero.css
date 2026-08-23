@@ -1,0 +1,177 @@
+/* ============================================================
+   NINA SECHKO x ROBINEAU - scroll-opening hero
+   Self-contained. Everything is namespaced under .nsx so it
+   cannot collide with Tilda's own styles.
+   ============================================================ */
+.nsx *,.nsx *::before,.nsx *::after{box-sizing:border-box}
+.nsx{
+  /* Ground. Sampled off the film's studio backdrop so the frames sit on
+     the page rather than on top of it. Set your Tilda page background to
+     --ground (#ECEDF1) and the seam disappears. */
+  --ground:#ECEDF1;
+  --ground-hi:#F5F6FA;
+  --ground-lo:#E1E2E9;
+  --ink:#16161A;
+  --ink-soft:#5D5D68;
+  --ink-mid:#33333C;
+  --ink-faint:#9B9BA6;
+
+  --sans:"Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --pad:clamp(20px,5.5vw,64px);
+
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--ground);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  /* clip, NOT hidden - overflow:hidden on an ancestor kills position:sticky,
+     which is the whole mechanism here. */
+  overflow-x:clip;
+}
+.nsx canvas{display:block;max-width:100%}
+.nsx p{margin:0}
+.nsx h1{margin:0;font-weight:400;line-height:1.06}
+
+/* ---------- the scroll runway ----------
+   Taller = the box opens more slowly as you scroll. This is the one number
+   worth playing with: 400svh means four screens of scrolling to open it. */
+.nsx__scrolly{
+  position:relative;
+  height:400vh;    /* fallback for browsers without svh */
+  height:400svh;
+  background:radial-gradient(120% 78% at 50% 42%,var(--ground-hi) 0%,var(--ground) 55%,var(--ground-lo) 100%);
+}
+@media (min-width:860px){.nsx__scrolly{height:520vh;height:520svh}}
+@media (max-width:520px){.nsx__scrolly{height:360vh;height:360svh}}
+
+.nsx__stage{
+  position:sticky;
+  top:0;
+  /* svh (not vh / dvh) so the iOS URL bar collapsing never resizes the
+     stage mid-scroll - that is the classic cause of jitter. */
+  height:100vh;
+  height:100svh;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+}
+
+/* The canvas is a centred 9:16 box. On a phone it is wider than the screen,
+   so the frame covers edge to edge. On desktop it settles to exactly 9:16
+   and the studio ground either side is the page itself.
+
+   NOTE: no edge mask and no bottom scrim. During the card burst the artwork
+   reaches all four edges of the frame, so any fade clips it. The seam is
+   handled by matching the page ground to the film's backdrop instead. */
+.nsx__canvas{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  height:100vh;
+  height:100svh;
+  width:min(100%,calc(100vh * 0.5625));
+  width:min(100%,calc(100svh * 0.5625));
+}
+
+/* ---------- captions (optional) ---------- */
+.nsx__caps{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  padding:var(--pad);
+  padding-left:calc(var(--pad) + env(safe-area-inset-left,0px));
+  padding-right:calc(var(--pad) + env(safe-area-inset-right,0px));
+  display:grid;
+}
+.nsx__cap{
+  grid-area:1/1;
+  align-self:end;
+  justify-self:start;
+  max-width:min(30ch,94%);
+  opacity:0;
+  will-change:opacity,transform;
+  padding-bottom:clamp(52px,10vh,84px);
+}
+.nsx__cap > * + *{margin-top:.7em}
+
+/* Legibility without a scrim: a soft halo of the ground colour around the
+   glyphs themselves. Costs nothing where the frame is empty, and only
+   touches the pixels immediately behind the type where it is not. */
+.nsx__cap p,.nsx__cap h1{
+  text-shadow:
+    0 0 8px rgba(236,237,241,.95),
+    0 0 18px rgba(236,237,241,.85),
+    0 0 34px rgba(236,237,241,.6);
+}
+
+@media (min-width:860px){
+  /* wide screens: captions leave the frame and sit in the left gutter */
+  .nsx__cap{align-self:center;padding-bottom:0;max-width:min(32ch,32%)}
+  .nsx__cap p,.nsx__cap h1{text-shadow:none}
+}
+
+.nsx__eyebrow{
+  font-size:clamp(10px,2.5vw,12px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  font-weight:500;
+}
+.nsx__title{
+  font-size:clamp(44px,13vw,112px);
+  line-height:.94;
+  letter-spacing:-.038em;
+  font-weight:400;
+}
+.nsx__capText{
+  font-size:clamp(16px,4.2vw,21px);
+  line-height:1.45;
+  color:var(--ink-mid);
+  max-width:24ch;
+}
+
+/* ---------- scroll hint ---------- */
+.nsx__hint{
+  position:absolute;
+  right:calc(var(--pad) + env(safe-area-inset-right,0px));
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:.8em;
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  pointer-events:none;
+  will-change:opacity;
+}
+.nsx__hintBar{
+  display:block;width:1px;height:34px;
+  background:linear-gradient(var(--ink-faint),transparent);
+}
+@media (prefers-reduced-motion:no-preference){
+  .nsx__hintBar{animation:nsxDrop 2.1s ease-in-out infinite}
+}
+@keyframes nsxDrop{
+  0%,100%{transform:scaleY(.35);transform-origin:top;opacity:.35}
+  50%{transform:scaleY(1);transform-origin:top;opacity:1}
+}
+@media (min-width:860px){
+  .nsx__hint{left:50%;right:auto;transform:translateX(-50%);align-items:center}
+}
+
+/* ---------- loading meter ---------- */
+.nsx__meter{position:absolute;left:0;top:0;height:2px;width:100%;pointer-events:none}
+.nsx__meterFill{
+  height:100%;width:0%;
+  background:#D9674F;
+  transition:width .3s linear,opacity .6s .4s;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .nsx__hintBar{animation:none}
+}

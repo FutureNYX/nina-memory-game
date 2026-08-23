@@ -1,0 +1,31 @@
+<!-- =========================================================
+     THE BOX-OPENING ANIMATION
+     Drop this into one Tilda "T123 / HTML-код" block.
+
+     TO REMOVE A CAPTION: delete the whole <div class="nsx__cap">...</div>
+     block. They are independent - remove one, some, or all of them.
+     TO REMOVE ALL TEXT: delete everything between
+     <div class="nsx__caps"> and its closing </div>, and the nsx__hint block.
+
+     data-from / data-to are positions in the scroll, 0 = box closed,
+     1 = cards fully out. Change them to re-time when text appears.
+     ========================================================= -->
+<div class="nsx">
+  <section class="nsx__scrolly" aria-label="Коробка открывается">
+    <div class="nsx__stage">
+
+      <canvas class="nsx__canvas"
+              role="img"
+              aria-label="Собранная вручную коробка раскрывается, и из нее вылетает колода карт с картинами"
+              style="background:#ECEDF1 url('{{BASE}}/media/poster.webp') center/cover no-repeat"></canvas>
+
+      <div class="nsx__meter" aria-hidden="true"><span class="nsx__meterFill"></span></div>
+
+      <div class="nsx__caps">
+{{CAPTIONS}}
+      </div>
+
+{{HINT}}
+    </div>
+  </section>
+</div>

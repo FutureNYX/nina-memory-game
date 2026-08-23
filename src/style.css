@@ -116,13 +116,6 @@
   width:min(100%,calc(100vh * 0.5625));
   width:min(100%,calc(100svh * 0.5625));
 }
-@media (min-width:860px){
-  /* feather the vertical edges into the page ground so there is no seam */
-  .nsx__canvas{
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100%);
-    mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100%);
-  }
-}
 .nsx__caps{
   position:absolute;
   inset:0;
@@ -143,6 +136,16 @@
 }
 .nsx__cap > * + *{margin-top:.7em}
 
+/* Legibility without a scrim: a halo of the ground colour around the glyphs
+   themselves. During the card burst the artwork reaches all four edges of
+   the frame, so any gradient band would clip it. */
+.nsx__cap p,.nsx__cap h1{
+  text-shadow:
+    0 0 8px rgba(236,237,241,.95),
+    0 0 18px rgba(236,237,241,.85),
+    0 0 34px rgba(236,237,241,.6);
+}
+
 /* On a wide screen the frame is a centred portrait strip, so the
    captions move out of it and sit in the left gutter, on the ground. */
 @media (min-width:860px){
@@ -151,21 +154,9 @@
     padding-bottom:0;
     max-width:min(32ch,32%);
   }
+  .nsx__cap p,.nsx__cap h1{text-shadow:none}
 }
 
-/* Light scrim so caption text survives the card burst on phones,
-   where the frame runs edge to edge. Not needed on desktop. */
-.nsx__scrim{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:linear-gradient(to top,
-    rgba(236,237,241,.93) 0%,
-    rgba(236,237,241,.82) 13%,
-    rgba(236,237,241,.42) 25%,
-    rgba(236,237,241,0) 39%);
-}
-@media (min-width:860px){.nsx__scrim{display:none}}
 
 .nsx__title{
   font-size:clamp(44px,13vw,112px);
