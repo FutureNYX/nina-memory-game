@@ -1,7 +1,14 @@
 # Nina Sechko × ROBINEAU — scroll-opening product page
 
 A one-page product site whose hero is your box-opening film, scrubbed by the
-scroll wheel / thumb rather than played.
+scroll wheel / thumb rather than played. Russian copy throughout.
+
+**Live:** https://futurenyx.github.io/nina-memory-game/
+**Repo:** https://github.com/FutureNYX/nina-memory-game (public — it has to be,
+GitHub Pages won't serve from a private repo on a free account)
+
+That URL is doing two jobs: it is the working page, and it is the asset host the
+Tilda block points at.
 
 ---
 
@@ -60,9 +67,27 @@ included) uses an **image sequence drawn to a canvas**, and so does this.
 | Scroll handlers janking the main thread | Nothing runs on `scroll`. A `requestAnimationFrame` loop reads the position, and it only runs while the hero is on screen |
 | Retina blowing up the canvas buffer | `devicePixelRatio` capped at 2 |
 | Text over the card burst becomes unreadable | A light scrim sits under the captions on phones only; on desktop the captions move out of the frame into the left gutter |
-| Fat-finger targets | Buy buttons are 56 px tall, plus a sticky "Add to bag" bar that appears after the hero and hides once the real buy block is on screen |
+| Fat-finger targets | Buy buttons are 56 px tall, plus a sticky «В корзину» bar that appears after the hero and hides once the real buy block is on screen |
+| A CDN 503 or a dropped connection leaves a hole you can see when scrubbing slowly | Each frame retries twice with backoff before giving up; `nearestLoaded()` covers whatever is still missing |
 
 Reduced-motion, no-JS and no-`svh` fallbacks are all in place.
+
+---
+
+## Typography
+
+- **Golos Text** (Google Fonts, Cyrillic-first, by Paratype) carries all the
+  Russian — headings, body, labels. It is drawn for Cyrillic rather than being a
+  Latin family with Cyrillic added, so the вязь of the lowercase holds together
+  at body sizes.
+- **Barlow Regular** is loaded for exactly one element: the artist-name lockup,
+  set in caps with two literal spaces between letters per ROBINEAU house rule.
+
+**The lockup was left in Latin — `N  I  N  A      S  E  C  H  K  O` — on
+purpose.** Barlow contains no Cyrillic at all, so setting «НИНА СЕЧКО» in it
+would silently fall back to a system font and quietly break the house lockup.
+If you want the name in Cyrillic there, that is a real decision to make: it
+means either picking a second display face for it, or accepting the fallback.
 
 ---
 
@@ -72,19 +97,21 @@ Everything below is placeholder. Search `src/page.html` for `REPLACE`.
 
 | Where | Placeholder now |
 |---|---|
-| Product name (3 places: hero `<h1>`, buy block `<h2>`, `<title>` in build.py) | "The Memory Game" |
+| Product name (3 places: hero `<h1>`, buy block `<h2>`, `<title>` in build.py) | «Мемори» |
 | Hero captions ×4 | generic lines about the box |
-| "The edition" statement + body | drawn from Nina's bio on robineauart.com |
-| "How it plays" copy | invented rules — **check these are actually right** |
+| «Издание» statement + body | translated from Nina's bio on robineauart.com |
+| «Как играть» copy | **invented rules — check these against the actual game** |
 | Triptych captions ×3 | generic |
-| Specification table | every value is `000` / `00 × 00 mm` |
-| Price (3 places: buy block, sticky bar, and Tilda config) | £45 |
+| Specification table | every value is `000` / `00 × 00 мм` |
+| Price (2 places: buy block and sticky bar) | 4 500 ₽ |
 | Shipping / returns line | invented |
-| Checkout URL | `https://buy.stripe.com/REPLACE_ME` in `src/app.js` |
+| Checkout | not wired yet — see below |
 
-The ROBINEAU contact block and the `N  I  N  A      S  E  C  H  K  O` lockup
-are correct as-is — the lockup uses literal spaces per house rule, so don't
-"tidy" them into `letter-spacing`.
+House rule observed throughout: **no «ё»** anywhere in the Russian. If you edit
+the copy, keep it that way — `grep` for it before rebuilding.
+
+The ROBINEAU contact block is correct as-is. So is the lockup — it uses literal
+spaces per house rule, so don't "tidy" them into `letter-spacing`.
 
 ---
 
@@ -104,18 +131,28 @@ Tilda's file manager handles well. Host `frames/` and `media/` somewhere with a
 plain HTTPS URL — GitHub Pages is free and fine — then rebuild with
 `--base https://that-host` so every path points at it.
 
-### Payment
+### Payment — not wired yet
 
-`src/app.js` → `NSX_CONFIG.checkout` has two modes.
+You said it has to work with Russian cards, so this is deliberately left
+unconnected rather than guessed at. The button is live and styled; it just has
+no destination.
 
-**`mode: 'link'`** (default, simplest) — the button is just a link. Paste a
-Stripe Payment Link, a PayPal button URL, anything. No Tilda store needed.
+`src/app.js` → `NSX_CONFIG.checkout` has both paths already written:
 
-**`mode: 'tilda'`** — the button pushes the product into Tilda's own cart, so
-you use whatever gateway is already connected to your Tilda account. This needs
-a **Store block (ST100 / T754)** somewhere on the same page — it can be styled
-invisible, it just has to exist for `tcart__addProduct` to be defined. Fill in
-`checkout.tilda.{id, name, price}` to match your Tilda product.
+**`mode: 'link'`** — the button becomes a plain link. Drop in any checkout URL:
+a YooKassa (ЮKassa) or Tinkoff payment page, a Tilda payment link, whatever you
+end up using. One line to change.
+
+**`mode: 'tilda'`** — the button pushes the product into Tilda's own cart, so it
+uses whichever gateway is connected to your Tilda account. This is probably the
+right answer for Russian cards, since Tilda integrates ЮKassa, Tinkoff, Robokassa
+and CloudPayments directly. It needs a **Store block (ST100 / T754)** somewhere
+on the same page — it can be styled invisible, it only has to exist so
+`tcart__addProduct` is defined. Then fill in `checkout.tilda.{id, name, price}`
+to match the Tilda product.
+
+Note that Stripe does **not** process Russian-issued cards, so ignore any
+Stripe references you see in older comments.
 
 ---
 

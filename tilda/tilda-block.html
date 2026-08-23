@@ -680,18 +680,25 @@
     frameExt: '.webp',
 
     /* ---- CHECKOUT --------------------------------------------------
-       mode: 'link'  -> button is a plain link (Stripe Payment Link,
-                        Tilda payment page, PayPal, anything).
-       mode: 'tilda' -> button pushes the product into Tilda's own cart
-                        (needs a Store block on the page - see README).
+       NOT WIRED YET. Needs to accept Russian cards, so nothing was
+       guessed at here. Stripe is not an option - it does not process
+       Russian-issued cards.
+
+       mode: 'link'  -> button becomes a plain link. Drop in a YooKassa /
+                        Tinkoff / Tilda payment URL and you are done.
+       mode: 'tilda' -> button pushes the product into Tilda's own cart, so
+                        it uses whichever gateway is connected to your Tilda
+                        account (YooKassa, Tinkoff, Robokassa, CloudPayments).
+                        Needs a Store block (ST100 / T754) on the page - see
+                        README.
     ------------------------------------------------------------------ */
     checkout: {
       mode: 'link',
-      url: 'https://buy.stripe.com/REPLACE_ME',        // <<REPLACE>>
+      url: '',                                          // <<REPLACE>> checkout URL
       tilda: {
-        id: 'nsx-memory-01',
-        name: 'Nina Sechko - The Memory Game',          // <<REPLACE>>
-        price: '4500',                                  // <<REPLACE>> minor units per Tilda setup
+        id: 'nsx-memori-01',
+        name: 'Нина Сечко — Мемори',                     // <<REPLACE>>
+        price: '4500',                                   // <<REPLACE>> per your Tilda product
         img: '/media/still-backs.webp',
         options: []
       }
@@ -953,14 +960,14 @@
       return;
     }
     /* mode: 'link' - let the anchor navigate normally */
-    if (!cfg.url || /REPLACE_ME/.test(cfg.url)) {
+    if (!cfg.url || cfg.url === '#') {
       e.preventDefault();
-      console.warn('[nsx] Set NSX_CONFIG.checkout.url before going live.');
+      console.warn('[nsx] No checkout URL set yet - see NSX_CONFIG.checkout.');
     }
   }
 
   [].slice.call(root.querySelectorAll('[data-nsx-buy]')).forEach(function (b) {
-    if (NSX_CONFIG.checkout.mode === 'link' && b.tagName === 'A') {
+    if (NSX_CONFIG.checkout.mode === 'link' && b.tagName === 'A' && NSX_CONFIG.checkout.url) {
       b.setAttribute('href', NSX_CONFIG.checkout.url);
     }
     b.addEventListener('click', goCheckout);
