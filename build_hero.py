@@ -52,7 +52,7 @@ CAP_REST = """
         <!-- as the box splits open -->
         <div class="nsx__cap" data-from="0.28" data-to="0.44">
           <p class="nsx__eyebrow">Коробка</p>
-          <p class="nsx__capText">Раскрывается сразу на четыре стороны.</p>
+          <p class="nsx__capText">Колода хранится в коробочке, оформленной как плетеная корзина с картины Нины Сечко. Открывать ее почти так же приятно, как играть.</p>
         </div>
 
         <!-- box lying open -->

@@ -155,27 +155,33 @@
   grid-area:1/1;
   align-self:end;
   justify-self:start;
-  max-width:min(30ch,94%);
+  max-width:min(34ch,94%);
   opacity:0;
   will-change:opacity,transform;
   padding-bottom:clamp(52px,10vh,84px);
 }
 .nsx__cap > * + *{margin-top:.7em}
 
-/* Legibility without a scrim: a soft halo of the ground colour around the
-   glyphs themselves. Costs nothing where the frame is empty, and only
-   touches the pixels immediately behind the type where it is not. */
-.nsx__cap p,.nsx__cap h1{
+/* Legibility without a scrim: a halo of the ground colour around the glyphs
+   themselves. Only touches the pixels immediately behind the type, so it
+   costs nothing where the frame is empty. Stacked fairly heavily because a
+   long caption ends up over the box itself, which is dark and busy. */
+.nsx__cap p{
   text-shadow:
-    0 0 8px rgba(236,237,241,.95),
-    0 0 18px rgba(236,237,241,.85),
-    0 0 34px rgba(236,237,241,.6);
+    0 0 6px rgba(var(--ground-rgb),1),
+    0 0 12px rgba(var(--ground-rgb),.98),
+    0 0 22px rgba(var(--ground-rgb),.92),
+    0 0 38px rgba(var(--ground-rgb),.75),
+    0 0 60px rgba(var(--ground-rgb),.5);
 }
+/* the small uppercase label has thin strokes, so it needs the most help */
+.nsx__cap .nsx__eyebrow{color:var(--ink-mid)}
 
 @media (min-width:860px){
   /* wide screens: captions leave the frame and sit in the left gutter */
   .nsx__cap{align-self:center;padding-bottom:0;max-width:min(32ch,32%)}
-  .nsx__cap p,.nsx__cap h1{text-shadow:none}
+  .nsx__cap p{text-shadow:none}
+  .nsx__cap .nsx__eyebrow{color:var(--ink-soft)}
 }
 
 .nsx__eyebrow{
@@ -195,7 +201,7 @@
   font-size:clamp(16px,4.2vw,21px);
   line-height:1.45;
   color:var(--ink-mid);
-  max-width:24ch;
+  max-width:32ch;
 }
 
 /* ---------- scroll hint ---------- */
@@ -281,7 +287,7 @@
         <!-- as the box splits open -->
         <div class="nsx__cap" data-from="0.28" data-to="0.44">
           <p class="nsx__eyebrow">Коробка</p>
-          <p class="nsx__capText">Раскрывается сразу на четыре стороны.</p>
+          <p class="nsx__capText">Колода хранится в коробочке, оформленной как плетеная корзина с картины Нины Сечко. Открывать ее почти так же приятно, как играть.</p>
         </div>
 
         <!-- box lying open -->
