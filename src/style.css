@@ -107,11 +107,12 @@
   overflow:hidden;
   background:var(--ground-lo);
   aspect-ratio:9/16;
-  max-height:74svh;
+  /* cap by WIDTH, not max-height: capping the height leaves the box wider
+     than 9:16 and object-fit:cover then crops the top and bottom off. */
+  width:min(100%,calc(78svh * 0.5625));
   margin-inline:auto;
-  width:100%;
 }
-.nsx__playFrame video{width:100%;height:100%;object-fit:cover}
+.nsx__playFrame video{width:100%;height:100%;object-fit:contain}
 .nsx__playCopy > * + *{margin-top:clamp(14px,2.6vw,22px)}
 
 /* ============================================================

@@ -1,0 +1,82 @@
+/* ============================================================
+   NINA SECHKO x ROBINEAU - "Как играть" section
+   Self-contained, namespaced under .nsxp so it cannot collide
+   with Tilda's styles or with the animation block.
+   ============================================================ */
+.nsxp *,.nsxp *::before,.nsxp *::after{box-sizing:border-box}
+.nsxp{
+  /* background of this section - match it to the block above or below */
+  --ground:#ECEDF1;
+  --ink:#16161A;
+  --ink-soft:#5D5D68;
+  --ink-mid:#33333C;
+
+  --sans:"TildaSans","Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --pad:clamp(20px,5.5vw,64px);
+  --maxw:1180px;
+
+  /* biggest the film is allowed to get, as a share of screen height.
+     It is capped through the WIDTH so the 9:16 shape is never broken. */
+  --film-max-h:78svh;
+
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--ground);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+.nsxp p{margin:0}
+.nsxp h2{margin:0;font-weight:400;letter-spacing:-.015em;line-height:1.06}
+.nsxp video{display:block;max-width:100%}
+
+.nsxp__inner{
+  padding:clamp(64px,11vw,130px) var(--pad);
+  max-width:var(--maxw);
+  margin-inline:auto;
+  display:grid;
+  gap:clamp(28px,5vw,64px);
+  align-items:center;
+  grid-template-columns:1fr;
+}
+@media (min-width:860px){
+  .nsxp__inner{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+
+/* ---- the film ----
+   The container is 9:16 and its size is limited by WIDTH, not height.
+   Capping the height directly (max-height) leaves the box wider than
+   9:16, and object-fit:cover then crops the top and bottom off the
+   picture - which is the bug this replaces. */
+.nsxp__film{
+  position:relative;
+  aspect-ratio:9/16;
+  width:min(100%,calc(var(--film-max-h) * 0.5625));
+  margin-inline:auto;
+  border-radius:14px;
+  overflow:hidden;
+  background:#fff;
+}
+.nsxp__film video{
+  width:100%;
+  height:100%;
+  /* contain, not cover: the whole frame stays visible whatever the box */
+  object-fit:contain;
+}
+
+.nsxp__copy > * + *{margin-top:clamp(14px,2.6vw,22px)}
+.nsxp__eyebrow{
+  font-size:clamp(10px,2.5vw,12px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  font-weight:500;
+}
+.nsxp__h2{font-size:clamp(30px,6.2vw,60px);text-wrap:balance}
+.nsxp__body{
+  font-size:clamp(16px,3.9vw,19px);
+  line-height:1.62;
+  color:var(--ink-mid);
+  max-width:44ch;
+}

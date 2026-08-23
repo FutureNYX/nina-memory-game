@@ -74,57 +74,40 @@
   place-items:center;
 }
 
-/* The canvas is the largest 9:16 box that fits the screen, centred on both
-   axes, so the WHOLE frame is always visible and nothing is cropped. On a
-   tall phone that leaves a little ground above and below it; on a wide
-   screen, ground either side. Width and height are both pinned so the box
-   can never drift off 9:16 and stretch the picture. */
+/* The canvas fills the height of the stage and is centred. On a phone it is
+   wider than the screen, so the frame covers edge to edge with the sides
+   cropped; on desktop it settles to exactly 9:16 with page ground either
+   side. */
 .nsx__canvas{
   position:absolute;
-  top:50%;
+  top:0;
   left:50%;
-  transform:translate(-50%,-50%);
+  transform:translateX(-50%);
+  height:100vh;
+  height:100svh;
   width:min(100%,calc(100vh * 0.5625));
   width:min(100%,calc(100svh * 0.5625));
-  height:min(100vh,calc(100vw / 0.5625));
-  height:min(100svh,calc(100vw / 0.5625));
 }
-
 @media (min-width:860px){
-  /* On a wide screen the frame is narrower than the stage, so its left and
-     right edges are real edges too - feather them. On a phone the frame
-     already spans the full width, so there is nothing there to hide. */
+  /* feather the vertical edges into the page so the frame does not end on
+     a hard line. Not needed on a phone, where it is already full-bleed. */
   .nsx__canvas{
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-x),#000 calc(100% - var(--fade-x)),transparent 100%);
     mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-x),#000 calc(100% - var(--fade-x)),transparent 100%);
   }
 }
 
-/* Blend: feathers the frame's own edges into the page. It has to track the
-   canvas box exactly, not the viewport, or the fade lands in empty ground
-   instead of on the picture - so it repeats the sizing above. Top and
-   bottom both, since letterboxing makes both of them real edges. */
+/* Bottom blend: dissolves the foot of the frame into the page. Kept short so
+   it grounds the box without washing over it. */
 .nsx__scrim{
   position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:min(100%,calc(100vh * 0.5625));
-  width:min(100%,calc(100svh * 0.5625));
-  height:min(100vh,calc(100vw / 0.5625));
-  height:min(100svh,calc(100vw / 0.5625));
+  inset:0;
   pointer-events:none;
-  background:
-    linear-gradient(to top,
-      rgba(var(--ground-rgb),.97) 0%,
-      rgba(var(--ground-rgb),.80) calc(var(--fade-y) * 0.30),
-      rgba(var(--ground-rgb),.36) calc(var(--fade-y) * 0.64),
-      rgba(var(--ground-rgb),0)   var(--fade-y)),
-    linear-gradient(to bottom,
-      rgba(var(--ground-rgb),.97) 0%,
-      rgba(var(--ground-rgb),.80) calc(var(--fade-y) * 0.30),
-      rgba(var(--ground-rgb),.36) calc(var(--fade-y) * 0.64),
-      rgba(var(--ground-rgb),0)   var(--fade-y));
+  background:linear-gradient(to top,
+    rgba(var(--ground-rgb),.97) 0%,
+    rgba(var(--ground-rgb),.80) calc(var(--fade-y) * 0.30),
+    rgba(var(--ground-rgb),.36) calc(var(--fade-y) * 0.64),
+    rgba(var(--ground-rgb),0)   var(--fade-y));
 }
 
 /* ---------- captions (optional) ---------- */

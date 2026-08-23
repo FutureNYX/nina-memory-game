@@ -86,9 +86,10 @@
   place-items:center;
 }
 
-/* The canvas is a centred 9:16 box. On a phone it is wider than the screen,
-   so the frame covers edge to edge. On desktop it settles to exactly 9:16
-   and the studio ground either side is the page itself. */
+/* The canvas fills the height of the stage and is centred. On a phone it is
+   wider than the screen, so the frame covers edge to edge with the sides
+   cropped; on desktop it settles to exactly 9:16 with page ground either
+   side. */
 .nsx__canvas{
   position:absolute;
   top:0;
@@ -100,19 +101,16 @@
   width:min(100%,calc(100svh * 0.5625));
 }
 @media (min-width:860px){
-  /* Feather the vertical edges so the frame dissolves into the page
-     instead of ending on a hard line. Only on wide screens - on a phone
-     the frame is full-bleed and has no side edges to hide. */
+  /* feather the vertical edges into the page so the frame does not end on
+     a hard line. Not needed on a phone, where it is already full-bleed. */
   .nsx__canvas{
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-x),#000 calc(100% - var(--fade-x)),transparent 100%);
     mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade-x),#000 calc(100% - var(--fade-x)),transparent 100%);
   }
 }
 
-/* Bottom blend: dissolves the foot of the frame into the page. Kept short
-   so it grounds the box without washing over it. Caption legibility is
-   handled separately by the glyph halo below, so this does not have to
-   reach far enough to sit behind the text. */
+/* Bottom blend: dissolves the foot of the frame into the page. Kept short so
+   it grounds the box without washing over it. */
 .nsx__scrim{
   position:absolute;
   inset:0;
@@ -138,27 +136,33 @@
   grid-area:1/1;
   align-self:end;
   justify-self:start;
-  max-width:min(30ch,94%);
+  max-width:min(34ch,94%);
   opacity:0;
   will-change:opacity,transform;
   padding-bottom:clamp(52px,10vh,84px);
 }
 .nsx__cap > * + *{margin-top:.7em}
 
-/* Legibility without a scrim: a soft halo of the ground colour around the
-   glyphs themselves. Costs nothing where the frame is empty, and only
-   touches the pixels immediately behind the type where it is not. */
-.nsx__cap p,.nsx__cap h1{
+/* Legibility without a scrim: a halo of the ground colour around the glyphs
+   themselves. Only touches the pixels immediately behind the type, so it
+   costs nothing where the frame is empty. Stacked fairly heavily because a
+   long caption ends up over the box itself, which is dark and busy. */
+.nsx__cap p{
   text-shadow:
-    0 0 8px rgba(236,237,241,.95),
-    0 0 18px rgba(236,237,241,.85),
-    0 0 34px rgba(236,237,241,.6);
+    0 0 6px rgba(var(--ground-rgb),1),
+    0 0 12px rgba(var(--ground-rgb),.98),
+    0 0 22px rgba(var(--ground-rgb),.92),
+    0 0 38px rgba(var(--ground-rgb),.75),
+    0 0 60px rgba(var(--ground-rgb),.5);
 }
+/* the small uppercase label has thin strokes, so it needs the most help */
+.nsx__cap .nsx__eyebrow{color:var(--ink-mid)}
 
 @media (min-width:860px){
   /* wide screens: captions leave the frame and sit in the left gutter */
   .nsx__cap{align-self:center;padding-bottom:0;max-width:min(32ch,32%)}
-  .nsx__cap p,.nsx__cap h1{text-shadow:none}
+  .nsx__cap p{text-shadow:none}
+  .nsx__cap .nsx__eyebrow{color:var(--ink-soft)}
 }
 
 .nsx__eyebrow{
@@ -178,7 +182,7 @@
   font-size:clamp(16px,4.2vw,21px);
   line-height:1.45;
   color:var(--ink-mid);
-  max-width:24ch;
+  max-width:32ch;
 }
 
 /* ---------- scroll hint ---------- */
@@ -333,11 +337,12 @@
   overflow:hidden;
   background:var(--ground-lo);
   aspect-ratio:9/16;
-  max-height:74svh;
+  /* cap by WIDTH, not max-height: capping the height leaves the box wider
+     than 9:16 and object-fit:cover then crops the top and bottom off. */
+  width:min(100%,calc(78svh * 0.5625));
   margin-inline:auto;
-  width:100%;
 }
-.nsx__playFrame video{width:100%;height:100%;object-fit:cover}
+.nsx__playFrame video{width:100%;height:100%;object-fit:contain}
 .nsx__playCopy > * + *{margin-top:clamp(14px,2.6vw,22px)}
 
 /* ============================================================
@@ -743,12 +748,18 @@
   'use strict';
 
   var NSX_HERO = {
-    /* Where the frames live. Must be an https:// base with a /frames
-       folder under it. Tilda cannot host these - see the README. */
+    /* Where the frames live. Must be an https:// base with the frame
+       folders under it. Tilda cannot host these - see the README. */
     assetBase: 'https://futurenyx.github.io/nina-memory-game',
     frameCount: 123,
-    framePrefix: '/frames/f_',
-    frameExt: '.webp'
+    frameExt: '.webp',
+
+    /* Two frame sets at different resolutions. The page picks one at load
+       from screen width x pixel density, so a 3x phone gets the sharp set
+       and an older 2x phone is not made to download it.
+       To force one, set the other to null. */
+    std: { dir: '/frames/f_',    width: 756  },   /* ~2.8 MB */
+    hi:  { dir: '/frames-hi/f_', width: 1080 }    /* ~4.6 MB, source resolution */
   };
 
   /* ---------------------------------------------------------- */
@@ -758,7 +769,38 @@
 
   var BASE = (NSX_HERO.assetBase || '.').replace(/\/$/, '');
   var TOTAL = NSX_HERO.frameCount;
-  var FRAME_AR = 756 / 1344;
+  var FRAME_AR = 9 / 16;
+  var MAX_DPR = 3;
+
+  /* ---------------------------------------------------------
+     Which frame set to download.
+
+     The canvas is the largest 9:16 box that fits the screen, so the pixels
+     actually needed are (that box's CSS width) x (pixel density). If the
+     small set would have to be stretched more than ~15% we fetch the big
+     one; otherwise the small one is already sharp and 1.8 MB lighter.
+
+     Overridden down to the small set when the device reports little memory
+     or the user has asked for reduced data, because holding 123 decoded
+     1080x1920 frames is not free.
+     --------------------------------------------------------- */
+  function pickSet() {
+    var std = NSX_HERO.std, hi = NSX_HERO.hi;
+    if (!hi) return std;
+    if (!std) return hi;
+
+    var conn = navigator.connection || {};
+    if (conn.saveData) return std;
+    if (navigator.deviceMemory && navigator.deviceMemory < 4) return std;
+
+    var d = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    var vw = document.documentElement.clientWidth || window.innerWidth;
+    var vh = window.innerHeight;
+    var cssW = Math.min(vw, vh * FRAME_AR);
+    return (cssW * d) > std.width * 1.15 ? hi : std;
+  }
+
+  var SET = pickSet();
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -768,7 +810,7 @@
     if (window.NSX_FRAMES) return window.NSX_FRAMES[i - 1];
     var n = String(i);
     while (n.length < 3) n = '0' + n;
-    return BASE + NSX_HERO.framePrefix + n + NSX_HERO.frameExt;
+    return BASE + SET.dir + n + NSX_HERO.frameExt;
   }
 
   /* ---------------------------------------------------------
@@ -843,7 +885,7 @@
   function sizeCanvas() {
     var r = canvas.getBoundingClientRect();
     if (r.width < 1 || r.height < 1) return false;
-    var d = Math.min(window.devicePixelRatio || 1, 2);
+    var d = Math.min(window.devicePixelRatio || 1, MAX_DPR);
     if (r.width === cssW && r.height === cssH && d === dpr) return false;
     dpr = d; cssW = r.width; cssH = r.height;
     canvas.width = Math.round(cssW * dpr);
@@ -933,6 +975,9 @@
   loadFrame(1)
     .then(function () { paint(1); return runQueue(coarse, 6); })
     .then(function () { return runQueue(fine, 6); });
+
+  /* handy when checking which set a real device chose */
+  window.NSX_HERO_SET = SET;
 })();
 
 /* ============================================================

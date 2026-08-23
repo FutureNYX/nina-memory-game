@@ -11,12 +11,18 @@
   'use strict';
 
   var NSX_HERO = {
-    /* Where the frames live. Must be an https:// base with a /frames
-       folder under it. Tilda cannot host these - see the README. */
+    /* Where the frames live. Must be an https:// base with the frame
+       folders under it. Tilda cannot host these - see the README. */
     assetBase: 'https://futurenyx.github.io/nina-memory-game',
     frameCount: 123,
-    framePrefix: '/frames/f_',
-    frameExt: '.webp'
+    frameExt: '.webp',
+
+    /* Two frame sets at different resolutions. The page picks one at load
+       from screen width x pixel density, so a 3x phone gets the sharp set
+       and an older 2x phone is not made to download it.
+       To force one, set the other to null. */
+    std: { dir: '/frames/f_',    width: 756  },   /* ~2.8 MB */
+    hi:  { dir: '/frames-hi/f_', width: 1080 }    /* ~4.6 MB, source resolution */
   };
 
   /* ---------------------------------------------------------- */
@@ -26,7 +32,38 @@
 
   var BASE = (NSX_HERO.assetBase || '.').replace(/\/$/, '');
   var TOTAL = NSX_HERO.frameCount;
-  var FRAME_AR = 756 / 1344;
+  var FRAME_AR = 9 / 16;
+  var MAX_DPR = 3;
+
+  /* ---------------------------------------------------------
+     Which frame set to download.
+
+     The canvas is the largest 9:16 box that fits the screen, so the pixels
+     actually needed are (that box's CSS width) x (pixel density). If the
+     small set would have to be stretched more than ~15% we fetch the big
+     one; otherwise the small one is already sharp and 1.8 MB lighter.
+
+     Overridden down to the small set when the device reports little memory
+     or the user has asked for reduced data, because holding 123 decoded
+     1080x1920 frames is not free.
+     --------------------------------------------------------- */
+  function pickSet() {
+    var std = NSX_HERO.std, hi = NSX_HERO.hi;
+    if (!hi) return std;
+    if (!std) return hi;
+
+    var conn = navigator.connection || {};
+    if (conn.saveData) return std;
+    if (navigator.deviceMemory && navigator.deviceMemory < 4) return std;
+
+    var d = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    var vw = document.documentElement.clientWidth || window.innerWidth;
+    var vh = window.innerHeight;
+    var cssW = Math.min(vw, vh * FRAME_AR);
+    return (cssW * d) > std.width * 1.15 ? hi : std;
+  }
+
+  var SET = pickSet();
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -36,7 +73,7 @@
     if (window.NSX_FRAMES) return window.NSX_FRAMES[i - 1];
     var n = String(i);
     while (n.length < 3) n = '0' + n;
-    return BASE + NSX_HERO.framePrefix + n + NSX_HERO.frameExt;
+    return BASE + SET.dir + n + NSX_HERO.frameExt;
   }
 
   /* ---------------------------------------------------------
@@ -111,7 +148,7 @@
   function sizeCanvas() {
     var r = canvas.getBoundingClientRect();
     if (r.width < 1 || r.height < 1) return false;
-    var d = Math.min(window.devicePixelRatio || 1, 2);
+    var d = Math.min(window.devicePixelRatio || 1, MAX_DPR);
     if (r.width === cssW && r.height === cssH && d === dpr) return false;
     dpr = d; cssW = r.width; cssH = r.height;
     canvas.width = Math.round(cssW * dpr);
@@ -201,4 +238,7 @@
   loadFrame(1)
     .then(function () { paint(1); return runQueue(coarse, 6); })
     .then(function () { return runQueue(fine, 6); });
+
+  /* handy when checking which set a real device chose */
+  window.NSX_HERO_SET = SET;
 })();
