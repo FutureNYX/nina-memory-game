@@ -1,32 +1,55 @@
-# Adding the box-opening animation to your Tilda page
+# Adding the box-opening animation to memobyninasechko.tilda.ws
 
-You need a paid Tilda plan (Personal is enough — Free does not allow code blocks).
+Tested by injecting the block into your live page at both phone and desktop
+sizes. It sits between the video cover and the photo grid without touching
+either of them.
+
+You need a paid Tilda plan — Personal is enough. Free does not allow code blocks.
 
 ---
 
 ## 1. Add the block
 
-1. Open your page in the Tilda editor.
+1. Open the page in the Tilda editor.
 2. **Библиотека блоков → Другое → T123 «HTML-код»**.
-3. Drag it to wherever you want the animation — normally right at the top,
-   under the header.
-4. Click **Контент** on the block.
-5. Open **`hero-block.html`** (or `hero-block-plain.html`, see below), select
-   everything, copy it, and paste it into the box.
-6. **Сохранить** → **Опубликовать**.
+3. It lands at the bottom of the page. That's fine — you'll move it in step 2.
+4. Click **Контент** on the new block.
+5. Open `hero-block.html`, select all, copy, paste it into the box.
+6. **Сохранить**.
 
-That's it. One block, nothing else to install.
+## 2. Put it wherever you want
 
-## 2. Set the page background
+The animation is an ordinary Tilda block, so it goes anywhere any other block
+goes, and it works in any position on the page.
 
-The animation was shot on a pale grey studio backdrop, so the page behind it
-needs to be the same colour or you will see a seam where the block starts and
-ends.
+To move it, hover over the block in the editor and use the control panel that
+appears on its left:
 
-**Настройки сайта → Шрифты и цвета → Цвет фона → `#ECEDF1`**
+- the **↑ / ↓ arrows** move it one position at a time, or
+- **⠿ (drag handle)** — hold and drag it up the page, or
+- the **gear icon → «Переместить»** if you prefer a menu.
 
-(Or set just that one block's background to `#ECEDF1` if the rest of your page
-is a different colour.)
+To get what you described — cover, then animation, then the three photos —
+you only need to move **one** block. Either drag the animation up so it sits
+directly under the cover, or drag the photo block (the one with the three
+product shots) down so it sits below the animation. Same result, one drag.
+
+Then **Опубликовать**.
+
+## 3. Check the background
+
+The animation sits on a pale grey, `#ECEDF1`, sampled from the film's own
+studio backdrop so the frames sit *on* the page rather than on top of it.
+
+Your page uses white and `#F2F2F2` for its sections, so the grey reads as its
+own section — which looks intentional and gives the animation room to breathe.
+
+If you'd rather it matched the block above or below exactly, change one line
+near the top of the pasted code:
+
+```css
+--ground:#ECEDF1;     /* try #FFFFFF or #F2F2F2 */
+```
 
 ---
 
@@ -34,84 +57,86 @@ is a different colour.)
 
 | File | What you get |
 |---|---|
-| `hero-block.html` | The animation **plus four lines of text** that fade in and out as the box opens |
-| `hero-block-plain.html` | The animation **only** — no text at all |
+| `hero-block.html` | Animation **plus four short captions** that fade in and out as the box opens |
+| `hero-block-plain.html` | Animation **only** — no text at all |
 
-Use the plain one if you would rather write all the text in Tilda's own blocks.
+The captions are set in **TildaSans**, the font your site already uses, so they
+match everything else and cost no extra loading time.
+
+Note there is deliberately **no big heading** in the block — your cover block
+already has «Авторская игра МЕМО» as the page's H1, and a second one would
+confuse search engines. There's also no scroll arrow, since your cover already
+has one.
 
 ---
 
 ## Yes, you can add and delete things
 
-**Everything except the animation itself is optional and safe to delete.**
+**Everything except the animation itself is optional.**
 
-### Remove one line of text
-In the pasted code, find a chunk that looks like this and delete the whole
-thing, from `<div` to `</div>`:
+### Remove one caption
+Find a chunk like this in the pasted code and delete it, from `<div` to `</div>`:
 
 ```html
 <!-- caption 2 - as the box splits open -->
-<div class="nsx__cap" data-from="0.26" data-to="0.42">
+<div class="nsx__cap" data-from="0.28" data-to="0.44">
   <p class="nsx__eyebrow">Коробка</p>
-  <p class="nsx__capText">Собрана вручную и раскрывается сразу на четыре стороны.</p>
+  <p class="nsx__capText">Раскрывается сразу на четыре стороны.</p>
 </div>
 ```
 
-The four captions are independent. Delete one, three, or all of them — the
-animation does not care.
+All four are independent. Delete one, three, or all of them.
 
 ### Change the wording
-Just type over the Russian text between the `<p>` tags. Two styles are
-available: `nsx__eyebrow` is the small grey uppercase label, `nsx__capText` is
-the normal sentence underneath.
+Type over the Russian between the `<p>` tags. Two styles are available:
+`nsx__eyebrow` is the small grey uppercase label, `nsx__capText` is the sentence
+under it.
 
-### Change *when* a line appears
+### Change *when* a caption appears
 `data-from` and `data-to` are positions in the scroll:
 
-- `0.00` = box still closed
-- `0.30` = box splitting open
-- `0.60` = box lying open
-- `1.00` = cards fully burst out
+| value | what's on screen |
+|---|---|
+| `0.00` | box still closed |
+| `0.30` | box splitting open |
+| `0.60` | box lying open |
+| `1.00` | cards fully burst out |
 
-So `data-from="0.26" data-to="0.42"` means "fade in a quarter of the way
-through, fade out just before halfway". Change the numbers to re-time it.
+So `data-from="0.28" data-to="0.44"` means "fade in just over a quarter of the
+way through, fade out before halfway".
 
-### Remove the "Листайте" hint
-Delete the `<div class="nsx__hint">…</div>` block.
-
-### Make the animation faster or slower to scroll through
-Near the top of the code, find:
+### Make the animation quicker or slower to scroll through
+Near the top of the code:
 
 ```css
 .nsx__scrolly{
-  height:400vh;
-  height:400svh;
+  height:350vh;
+  height:350svh;
 ```
 
-`400svh` means four screen-heights of scrolling to open the box fully. Lower it
-to `250svh` for a quicker open, raise it to `600svh` for a slower one. There are
-two more values further down for wide screens (`520svh`) and small phones
-(`360svh`) — change all of them together.
+`350svh` is about three and a half screens of scrolling to open the box fully.
+`250svh` is quicker, `500svh` is slower. There are two more values just below
+for wide screens (`450svh`) and small phones (`320svh`) — change all three
+together.
 
 ---
 
-## Everything else stays in Tilda
+## It won't disturb the rest of the page
 
-The animation block does not touch the rest of your page. Product description,
-photos, specifications, the cart and the payment button are all normal Tilda
-blocks, and they will work exactly as they always do. The code block is
-completely self-contained — every style in it is name-spaced, so it cannot
-change how your other blocks look.
+Every style in the block is name-spaced, so it cannot change how your other
+blocks look, and nothing else on the page can change how it looks. Your cover,
+photos, text, prices and the order button all keep working exactly as they do
+now.
 
 ---
 
-## One thing that cannot be changed
+## One thing that can't be changed
 
-The animation is 123 image files, and **Tilda cannot host them.** That is
-Tilda's own rule, not a limitation of this code — their help page on uploading
-your own files says: *«В данный момент загрузить файлы прямо на Tilda не
-получится»*, and recommends linking to an external service.
+The animation is 123 image files, and **Tilda cannot host them.** That's Tilda's
+own rule rather than a limitation of this code — their help page on uploading
+your own files says *«В данный момент загрузить файлы прямо на Tilda не
+получится»* and tells you to link to an external service instead.
 
-They are served from `https://futurenyx.github.io/nina-memory-game`, which is
-free and fast. Nothing to set up — the block already points at them. Just don't
+They're served from `https://futurenyx.github.io/nina-memory-game`, which is
+free and fast. Nothing to set up — the block already points there. Just don't
 delete that address from the code.

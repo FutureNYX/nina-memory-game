@@ -1,22 +1,23 @@
 <!-- ===========================================================
      NINA SECHKO x ROBINEAU - the box-opening animation
-     version WITH the four timed captions
+     version WITH four short captions that fade in and out
 
      PASTE ALL OF THIS INTO ONE TILDA BLOCK:
        Библиотека блоков -> Другое -> T123 "HTML-код"
 
-     Set your Tilda page background to #ECEDF1 so the block blends
-     into the page above and below it.
+     Move it anywhere on the page with the up/down arrows in the
+     block's control panel. It works in any position.
+
+     Background of this section is set by --ground near the top of
+     the CSS below. #ECEDF1 is sampled from the film's own backdrop;
+     #FFFFFF or #F2F2F2 also work if you want it to match a
+     neighbouring block exactly.
 
      Frames are served from:
        https://futurenyx.github.io/nina-memory-game
      Tilda cannot host them - that is Tilda's own rule, not a
      workaround. See the README.
      =========================================================== -->
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&display=swap">
 
 <style>
 /* let the block escape Tilda's 960px container */
@@ -28,9 +29,12 @@
    ============================================================ */
 .nsx *,.nsx *::before,.nsx *::after{box-sizing:border-box}
 .nsx{
-  /* Ground. Sampled off the film's studio backdrop so the frames sit on
-     the page rather than on top of it. Set your Tilda page background to
-     --ground (#ECEDF1) and the seam disappears. */
+  /* ===== THE ONE SETTING WORTH CHANGING =====
+     Background of this section. #ECEDF1 is sampled off the film's own
+     studio backdrop, so the frames sit on the page instead of on top of
+     it. If you would rather it matched a neighbouring Tilda section,
+     white (#FFFFFF) and #F2F2F2 both look fine too - just change the
+     three values on this line and the two below it.                      */
   --ground:#ECEDF1;
   --ground-hi:#F5F6FA;
   --ground-lo:#E1E2E9;
@@ -39,7 +43,9 @@
   --ink-mid:#33333C;
   --ink-faint:#9B9BA6;
 
-  --sans:"Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  /* TildaSans is already loaded on any Tilda page, so the captions match
+     the rest of the site and cost no extra network request. */
+  --sans:"TildaSans","Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --pad:clamp(20px,5.5vw,64px);
 
   font-family:var(--sans);
@@ -58,16 +64,17 @@
 .nsx h1{margin:0;font-weight:400;line-height:1.06}
 
 /* ---------- the scroll runway ----------
-   Taller = the box opens more slowly as you scroll. This is the one number
-   worth playing with: 400svh means four screens of scrolling to open it. */
+   Taller = the box opens more slowly as you scroll. 350svh means about
+   three and a half screens of scrolling to open the box fully. Drop it to
+   250svh for a quicker open, raise it to 500svh for a slower one. */
 .nsx__scrolly{
   position:relative;
-  height:400vh;    /* fallback for browsers without svh */
-  height:400svh;
+  height:350vh;    /* fallback for browsers without svh */
+  height:350svh;
   background:radial-gradient(120% 78% at 50% 42%,var(--ground-hi) 0%,var(--ground) 55%,var(--ground-lo) 100%);
 }
-@media (min-width:860px){.nsx__scrolly{height:520vh;height:520svh}}
-@media (max-width:520px){.nsx__scrolly{height:360vh;height:360svh}}
+@media (min-width:860px){.nsx__scrolly{height:450vh;height:450svh}}
+@media (max-width:520px){.nsx__scrolly{height:320vh;height:320svh}}
 
 .nsx__stage{
   position:sticky;
@@ -224,36 +231,34 @@
       <div class="nsx__meter" aria-hidden="true"><span class="nsx__meterFill"></span></div>
 
       <div class="nsx__caps">
-        <!-- caption 1 - shows while the box is still closed -->
-        <div class="nsx__cap" data-from="0.00" data-to="0.15" style="opacity:1">
-          <p class="nsx__eyebrow">ROBINEAU &times; НИНА СЕЧКО</p>
-          <h1 class="nsx__title">Мемори</h1>
-          <p class="nsx__capText">Коллекционное издание: живопись, в которую играют.</p>
+        <!-- caption 1 - while the box is still closed.
+             Deliberately NOT an <h1>: the page already has one in the
+             cover block above, and two would confuse search engines. -->
+        <div class="nsx__cap" data-from="0.00" data-to="0.16" style="opacity:1">
+          <p class="nsx__eyebrow">ROBINEAU GALLERY</p>
+          <p class="nsx__capText">Авторская игра МЕМО в оформлении Нины Сечко.</p>
         </div>
 
         <!-- caption 2 - as the box splits open -->
-        <div class="nsx__cap" data-from="0.26" data-to="0.42">
+        <div class="nsx__cap" data-from="0.28" data-to="0.44">
           <p class="nsx__eyebrow">Коробка</p>
-          <p class="nsx__capText">Собрана вручную и раскрывается сразу на четыре стороны.</p>
+          <p class="nsx__capText">Раскрывается сразу на четыре стороны.</p>
         </div>
 
         <!-- caption 3 - box lying open -->
-        <div class="nsx__cap" data-from="0.54" data-to="0.70">
+        <div class="nsx__cap" data-from="0.56" data-to="0.72">
           <p class="nsx__eyebrow">Внутри</p>
-          <p class="nsx__capText">Полная колода, напечатанная с оригинальных работ.</p>
+          <p class="nsx__capText">50 парных карточек с картинами Нины Сечко.</p>
         </div>
 
         <!-- caption 4 - as the cards burst out -->
-        <div class="nsx__cap" data-from="0.85" data-to="1.00">
+        <div class="nsx__cap" data-from="0.86" data-to="1.00">
           <p class="nsx__eyebrow">Игра</p>
-          <p class="nsx__capText">Переверните две карты. Найдите пару. Заберите картину.</p>
+          <p class="nsx__capText">Знакомые правила — и путешествие по миру художницы.</p>
         </div>
       </div>
 
-      <div class="nsx__hint" aria-hidden="true">
-        <span>Листайте</span>
-        <span class="nsx__hintBar"></span>
-      </div>
+
     </div>
   </section>
 </div>

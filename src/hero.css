@@ -5,9 +5,12 @@
    ============================================================ */
 .nsx *,.nsx *::before,.nsx *::after{box-sizing:border-box}
 .nsx{
-  /* Ground. Sampled off the film's studio backdrop so the frames sit on
-     the page rather than on top of it. Set your Tilda page background to
-     --ground (#ECEDF1) and the seam disappears. */
+  /* ===== THE ONE SETTING WORTH CHANGING =====
+     Background of this section. #ECEDF1 is sampled off the film's own
+     studio backdrop, so the frames sit on the page instead of on top of
+     it. If you would rather it matched a neighbouring Tilda section,
+     white (#FFFFFF) and #F2F2F2 both look fine too - just change the
+     three values on this line and the two below it.                      */
   --ground:#ECEDF1;
   --ground-hi:#F5F6FA;
   --ground-lo:#E1E2E9;
@@ -16,7 +19,9 @@
   --ink-mid:#33333C;
   --ink-faint:#9B9BA6;
 
-  --sans:"Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  /* TildaSans is already loaded on any Tilda page, so the captions match
+     the rest of the site and cost no extra network request. */
+  --sans:"TildaSans","Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --pad:clamp(20px,5.5vw,64px);
 
   font-family:var(--sans);
@@ -35,16 +40,17 @@
 .nsx h1{margin:0;font-weight:400;line-height:1.06}
 
 /* ---------- the scroll runway ----------
-   Taller = the box opens more slowly as you scroll. This is the one number
-   worth playing with: 400svh means four screens of scrolling to open it. */
+   Taller = the box opens more slowly as you scroll. 350svh means about
+   three and a half screens of scrolling to open the box fully. Drop it to
+   250svh for a quicker open, raise it to 500svh for a slower one. */
 .nsx__scrolly{
   position:relative;
-  height:400vh;    /* fallback for browsers without svh */
-  height:400svh;
+  height:350vh;    /* fallback for browsers without svh */
+  height:350svh;
   background:radial-gradient(120% 78% at 50% 42%,var(--ground-hi) 0%,var(--ground) 55%,var(--ground-lo) 100%);
 }
-@media (min-width:860px){.nsx__scrolly{height:520vh;height:520svh}}
-@media (max-width:520px){.nsx__scrolly{height:360vh;height:360svh}}
+@media (min-width:860px){.nsx__scrolly{height:450vh;height:450svh}}
+@media (max-width:520px){.nsx__scrolly{height:320vh;height:320svh}}
 
 .nsx__stage{
   position:sticky;

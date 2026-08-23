@@ -24,29 +24,30 @@ FONT = (
     'family=Golos+Text:wght@400;500;600&display=swap">'
 )
 
-CAPTIONS = """        <!-- caption 1 - shows while the box is still closed -->
-        <div class="nsx__cap" data-from="0.00" data-to="0.15" style="opacity:1">
-          <p class="nsx__eyebrow">ROBINEAU &times; НИНА СЕЧКО</p>
-          <h1 class="nsx__title">Мемори</h1>
-          <p class="nsx__capText">Коллекционное издание: живопись, в которую играют.</p>
+CAPTIONS = """        <!-- caption 1 - while the box is still closed.
+             Deliberately NOT an <h1>: the page already has one in the
+             cover block above, and two would confuse search engines. -->
+        <div class="nsx__cap" data-from="0.00" data-to="0.16" style="opacity:1">
+          <p class="nsx__eyebrow">ROBINEAU GALLERY</p>
+          <p class="nsx__capText">Авторская игра МЕМО в оформлении Нины Сечко.</p>
         </div>
 
         <!-- caption 2 - as the box splits open -->
-        <div class="nsx__cap" data-from="0.26" data-to="0.42">
+        <div class="nsx__cap" data-from="0.28" data-to="0.44">
           <p class="nsx__eyebrow">Коробка</p>
-          <p class="nsx__capText">Собрана вручную и раскрывается сразу на четыре стороны.</p>
+          <p class="nsx__capText">Раскрывается сразу на четыре стороны.</p>
         </div>
 
         <!-- caption 3 - box lying open -->
-        <div class="nsx__cap" data-from="0.54" data-to="0.70">
+        <div class="nsx__cap" data-from="0.56" data-to="0.72">
           <p class="nsx__eyebrow">Внутри</p>
-          <p class="nsx__capText">Полная колода, напечатанная с оригинальных работ.</p>
+          <p class="nsx__capText">50 парных карточек с картинами Нины Сечко.</p>
         </div>
 
         <!-- caption 4 - as the cards burst out -->
-        <div class="nsx__cap" data-from="0.85" data-to="1.00">
+        <div class="nsx__cap" data-from="0.86" data-to="1.00">
           <p class="nsx__eyebrow">Игра</p>
-          <p class="nsx__capText">Переверните две карты. Найдите пару. Заберите картину.</p>
+          <p class="nsx__capText">Знакомые правила — и путешествие по миру художницы.</p>
         </div>"""
 
 HINT = """      <div class="nsx__hint" aria-hidden="true">
@@ -61,8 +62,13 @@ HEADER = """<!-- ===========================================================
      PASTE ALL OF THIS INTO ONE TILDA BLOCK:
        Библиотека блоков -> Другое -> T123 "HTML-код"
 
-     Set your Tilda page background to #ECEDF1 so the block blends
-     into the page above and below it.
+     Move it anywhere on the page with the up/down arrows in the
+     block's control panel. It works in any position.
+
+     Background of this section is set by --ground near the top of
+     the CSS below. #ECEDF1 is sampled from the film's own backdrop;
+     #FFFFFF or #F2F2F2 also work if you want it to match a
+     neighbouring block exactly.
 
      Frames are served from:
        %s
@@ -80,7 +86,8 @@ def build_one(out_name, blurb, base, with_text):
     body = read('hero.html').replace('{{BASE}}', base.rstrip('/'))
     body = body.replace('{{CAPTIONS}}', CAPTIONS if with_text else
                         '        <!-- no captions in this version -->')
-    body = body.replace('{{HINT}}', HINT if with_text else '')
+    # her cover block already shows a scroll chevron, so the hint is off
+    body = body.replace('{{HINT}}', '')
 
     css = read('hero.css')
     js = read('hero.js').replace(
@@ -88,8 +95,6 @@ def build_one(out_name, blurb, base, with_text):
         "assetBase: '%s'" % base.rstrip('/'))
 
     parts = [HEADER % (blurb, base.rstrip('/'))]
-    if with_text:
-        parts.append(FONT)
     parts.append('<style>\n'
                  '/* let the block escape Tilda\'s 960px container */\n'
                  '.t-rec .t123__wrapper,.t123 .t-container,.t123 .t-col'
@@ -116,7 +121,7 @@ if __name__ == '__main__':
     ap.add_argument('--base', default='https://futurenyx.github.io/nina-memory-game')
     a = ap.parse_args()
     print('Building hero blocks...')
-    build_one('hero-block.html', 'version WITH the four timed captions',
+    build_one('hero-block.html', 'version WITH four short captions that fade in and out',
               a.base, True)
     build_one('hero-block-plain.html', 'version with NO text - animation only',
               a.base, False)
