@@ -14,7 +14,8 @@ You need a paid Tilda plan — Personal is enough. Free does not allow code bloc
 2. **Библиотека блоков → Другое → T123 «HTML-код»**.
 3. It lands at the bottom of the page. That's fine — you'll move it in step 2.
 4. Click **Контент** on the new block.
-5. Open `hero-block.html`, select all, copy, paste it into the box.
+5. Open one of the block files (see the table below), select all, copy,
+   paste it into the box.
 6. **Сохранить**.
 
 ## 2. Put it wherever you want
@@ -75,18 +76,26 @@ frame, so a long fade starts eating the cards. Anything past about `25%` on
 
 ## Which file to paste
 
-| File | What you get |
-|---|---|
-| `hero-block.html` | Animation **plus four short captions** that fade in and out as the box opens |
-| `hero-block-plain.html` | Animation **only** — no text at all |
+Four versions. They are the same animation — only the text and the blend differ.
 
-The captions are set in **TildaSans**, the font your site already uses, so they
-match everything else and cost no extra loading time.
+| File | Text | Blend |
+|---|---|---|
+| `hero-block-title.html` | Big **МЕМО** title + 3 captions + scroll hint | short (17% / 6%) |
+| `hero-block-title-longfade.html` | same | long (39% / 15%) |
+| `hero-block.html` | Small captions only, no big title | short |
+| `hero-block-plain.html` | None at all | short |
 
-Note there is deliberately **no big heading** in the block — your cover block
-already has «Авторская игра МЕМО» as the page's H1, and a second one would
-confuse search engines. There's also no scroll arrow, since your cover already
-has one.
+The two `-title-` files use **Golos Text**, a Cyrillic-first Russian family, and
+load it from Google Fonts. The other two use **TildaSans**, which your site
+already loads, so they cost no extra request. To switch either way, swap the
+first two names on the `--sans` line near the top of the CSS.
+
+**Short vs long fade.** The bottom of the picture dissolves into the page so the
+box looks like it is sitting on the page rather than inside a rectangle. Long
+(39%) gives a softer, more seamless join but reaches far enough up that it hazes
+over the bottom of the box during the card burst. Short (17%) stops clear of it.
+Paste whichever you prefer — or paste one and edit `--fade-y` to taste, since
+it is a single number.
 
 ---
 

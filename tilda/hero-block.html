@@ -1,6 +1,6 @@
 <!-- ===========================================================
      NINA SECHKO x ROBINEAU - the box-opening animation
-     version WITH four short captions that fade in and out
+     small captions only, no big title, short fade
 
      PASTE ALL OF THIS INTO ONE TILDA BLOCK:
        Библиотека блоков -> Другое -> T123 "HTML-код"
@@ -8,15 +8,15 @@
      Move it anywhere on the page with the up/down arrows in the
      block's control panel. It works in any position.
 
-     Background of this section is set by --ground near the top of
-     the CSS below. #ECEDF1 is sampled from the film's own backdrop;
-     #FFFFFF or #F2F2F2 also work if you want it to match a
-     neighbouring block exactly.
+     Two settings near the top of the CSS are worth knowing:
+       --ground / --ground-rgb  background colour of this section
+       --fade-y / --fade-x      how far the picture blends into it
+                                (this build: 17% and 6%)
 
      Frames are served from:
        https://futurenyx.github.io/nina-memory-game
      Tilda cannot host them - that is Tilda's own rule, not a
-     workaround. See the README.
+     workaround. See HOW-TO-ADD-TO-TILDA.md.
      =========================================================== -->
 
 <style>
@@ -263,27 +263,25 @@
       <div class="nsx__meter" aria-hidden="true"><span class="nsx__meterFill"></span></div>
 
       <div class="nsx__caps">
-        <!-- caption 1 - while the box is still closed.
-             Deliberately NOT an <h1>: the page already has one in the
-             cover block above, and two would confuse search engines. -->
+        <!-- opening line, no big display type -->
         <div class="nsx__cap" data-from="0.00" data-to="0.16" style="opacity:1">
           <p class="nsx__eyebrow">ROBINEAU GALLERY</p>
           <p class="nsx__capText">Авторская игра МЕМО в оформлении Нины Сечко.</p>
         </div>
 
-        <!-- caption 2 - as the box splits open -->
+        <!-- as the box splits open -->
         <div class="nsx__cap" data-from="0.28" data-to="0.44">
           <p class="nsx__eyebrow">Коробка</p>
           <p class="nsx__capText">Раскрывается сразу на четыре стороны.</p>
         </div>
 
-        <!-- caption 3 - box lying open -->
+        <!-- box lying open -->
         <div class="nsx__cap" data-from="0.56" data-to="0.72">
           <p class="nsx__eyebrow">Внутри</p>
           <p class="nsx__capText">50 парных карточек с картинами Нины Сечко.</p>
         </div>
 
-        <!-- caption 4 - as the cards burst out -->
+        <!-- as the cards burst out -->
         <div class="nsx__cap" data-from="0.86" data-to="1.00">
           <p class="nsx__eyebrow">Игра</p>
           <p class="nsx__capText">Знакомые правила — и путешествие по миру художницы.</p>

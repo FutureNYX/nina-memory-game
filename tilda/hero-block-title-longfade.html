@@ -1,6 +1,6 @@
 <!-- ===========================================================
      NINA SECHKO x ROBINEAU - the box-opening animation
-     no text at all - just the animation
+     big title + captions, LONG fade - softer join, reaches into the box
 
      PASTE ALL OF THIS INTO ONE TILDA BLOCK:
        Библиотека блоков -> Другое -> T123 "HTML-код"
@@ -11,13 +11,17 @@
      Two settings near the top of the CSS are worth knowing:
        --ground / --ground-rgb  background colour of this section
        --fade-y / --fade-x      how far the picture blends into it
-                                (this build: 17% and 6%)
+                                (this build: 39% and 15%)
 
      Frames are served from:
        https://futurenyx.github.io/nina-memory-game
      Tilda cannot host them - that is Tilda's own rule, not a
      workaround. See HOW-TO-ADD-TO-TILDA.md.
      =========================================================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&display=swap">
 
 <style>
 /* let the block escape Tilda's 960px container */
@@ -46,16 +50,17 @@
      Bigger = softer join but more of the picture washed out. These are
      deliberately short: during the card burst the artwork reaches all
      four edges, so a long fade eats into it. */
-  --fade-y:17%;
-  --fade-x:6%;
+  --fade-y:39%;
+  --fade-x:15%;
   --ink:#16161A;
   --ink-soft:#5D5D68;
   --ink-mid:#33333C;
   --ink-faint:#9B9BA6;
 
-  /* TildaSans is already loaded on any Tilda page, so the captions match
-     the rest of the site and cost no extra network request. */
-  --sans:"TildaSans","Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  /* Golos Text is a contemporary Russian family drawn Cyrillic-first, so
+     the type is not Latin metrics with Cyrillic bolted on. To use the
+     site's own TildaSans instead, swap the first two names round. */
+  --sans:"Golos Text","TildaSans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --pad:clamp(20px,5.5vw,64px);
 
   font-family:var(--sans);
@@ -263,10 +268,39 @@
       <div class="nsx__meter" aria-hidden="true"><span class="nsx__meterFill"></span></div>
 
       <div class="nsx__caps">
-        <!-- no captions in this version -->
+        <!-- Opening card. nsx__title is the big display line.
+             It is a <p> rather than an <h1> on purpose: the cover block
+             above already carries the page's H1, and two would compete in
+             search results. The styling is identical either way. -->
+        <div class="nsx__cap" data-from="0.00" data-to="0.16" style="opacity:1">
+          <p class="nsx__eyebrow">ROBINEAU GALLERY</p>
+          <p class="nsx__title">МЕМО</p>
+          <p class="nsx__capText">Авторская игра в оформлении Нины Сечко.</p>
+        </div>
+
+        <!-- as the box splits open -->
+        <div class="nsx__cap" data-from="0.28" data-to="0.44">
+          <p class="nsx__eyebrow">Коробка</p>
+          <p class="nsx__capText">Раскрывается сразу на четыре стороны.</p>
+        </div>
+
+        <!-- box lying open -->
+        <div class="nsx__cap" data-from="0.56" data-to="0.72">
+          <p class="nsx__eyebrow">Внутри</p>
+          <p class="nsx__capText">50 парных карточек с картинами Нины Сечко.</p>
+        </div>
+
+        <!-- as the cards burst out -->
+        <div class="nsx__cap" data-from="0.86" data-to="1.00">
+          <p class="nsx__eyebrow">Игра</p>
+          <p class="nsx__capText">Знакомые правила — и путешествие по миру художницы.</p>
+        </div>
       </div>
 
-
+      <div class="nsx__hint" aria-hidden="true">
+        <span>Листайте</span>
+        <span class="nsx__hintBar"></span>
+      </div>
     </div>
   </section>
 </div>
