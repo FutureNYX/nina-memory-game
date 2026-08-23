@@ -77,7 +77,7 @@
     if (pct >= 100) meterFill.style.opacity = '0';
   }
 
-  function loadFrame(i) {
+  function loadFrame(i, attempt) {
     return new Promise(function (resolve) {
       if (imgs[i]) return resolve();
       var im = new Image();
@@ -88,8 +88,20 @@
         if (i === lastFrame) lastDrawn = -1;
         resolve();
       };
-      im.onerror = function () { loadedCount++; bumpMeter(); resolve(); };
-      im.src = frameUrl(i);
+      im.onerror = function () {
+        /* CDNs throttle a burst of 123 requests, and phones drop off
+           mid-scroll. Retry twice before giving up; a missing frame is
+           survivable because nearestLoaded() substitutes a neighbour,
+           but a hole is visible if you scrub slowly across it. */
+        var n = attempt || 0;
+        if (n < 2) {
+          setTimeout(function () { resolve(loadFrame(i, n + 1)); }, 400 * (n + 1));
+          return;
+        }
+        loadedCount++; bumpMeter(); resolve();
+      };
+      /* cache-bust the retry, but never a data: URI from the inline build */
+      im.src = frameUrl(i) + (attempt && !window.NSX_FRAMES ? '?r=' + attempt : '');
     });
   }
 
