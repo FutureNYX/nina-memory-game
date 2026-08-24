@@ -72,9 +72,45 @@ deliberately short: when the cards burst out they fly to all four edges of the
 frame, so a long fade starts eating the cards. Anything past about `25%` on
 `--fade-y` becomes visible as haze over the box itself.
 
+### How much of the top of the picture is cut (phones)
+
+```css
+--crop-top:13%;
+```
+
+The closed box leaves about 27% of the frame empty above it, which reads as
+dead space on a tall phone screen. Cutting 13% removes half of that and fills
+the screen more, so the box also reads bigger. It never touches the box itself.
+
+`0%` shows the whole frame. Past about `20%` the cards start losing their tops
+during the burst. It is switched off above 860px wide, where the frame already
+sits inside the page rather than filling the screen.
+
 ---
 
-## Which file to paste
+## The blocks
+
+Each is one paste into its own T123 block, and each works in any position.
+
+| Block | What it is |
+|---|---|
+| `hero-block-title*.html` | The scroll-driven box-opening animation |
+| `play-block.html` | «Как играть» — the looping card film beside the rules |
+| `film-block.html` | The 43-second brand film, click to play with sound |
+
+### The film, and Tilda's 5 MB ceiling
+
+`film-block.html` does **not** upload the film to Tilda, so the 5 MB limit
+never applies to it. It streams from GitHub Pages at **1080p (34 MB)**, or
+**720p (13 MB)** on a narrow screen, chosen automatically. That is roughly
+seven times the quality Tilda's own limit would allow.
+
+Nothing downloads until someone presses play — the video is `preload="none"`
+behind a poster image, so a visitor who just scrolls past pays 47 KB.
+
+---
+
+## Which animation file to paste
 
 Four versions. They are the same animation — only the text and the blend differ.
 
