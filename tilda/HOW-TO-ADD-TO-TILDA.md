@@ -96,17 +96,28 @@ Each is one paste into its own T123 block, and each works in any position.
 |---|---|
 | `hero-block-title*.html` | The scroll-driven box-opening animation |
 | `play-block.html` | «Как играть» — the looping card film beside the rules |
-| `film-block.html` | The 43-second brand film, click to play with sound |
+| `film-block.html` | The brand film, **vertical** cut — click to play, with sound |
+| `film-wide-block.html` | The same film, **landscape** cut |
 
 ### The film, and Tilda's 5 MB ceiling
 
-`film-block.html` does **not** upload the film to Tilda, so the 5 MB limit
-never applies to it. It streams from GitHub Pages at **1080p (34 MB)**, or
-**720p (13 MB)** on a narrow screen, chosen automatically. That is roughly
-seven times the quality Tilda's own limit would allow.
+The film blocks do **not** upload anything to Tilda, so the 5 MB limit never
+applies to them. They stream from GitHub Pages:
+
+| Block | Normal screen | Narrow screen |
+|---|---|---|
+| `film-block.html` (9:16) | 1080×1920, 34 MB | 720×1280, 13 MB |
+| `film-wide-block.html` (16:9) | 1920×1080, 37 MB | 1280×720, 12 MB |
+
+That is roughly seven times the picture Tilda's own limit would allow. The
+right file is chosen automatically from screen size.
 
 Nothing downloads until someone presses play — the video is `preload="none"`
-behind a poster image, so a visitor who just scrolls past pays 47 KB.
+behind a poster image, so a visitor who just scrolls past pays under 90 KB.
+
+Both play **with sound**, since they are brand films rather than background
+loops. Delete the `<p class="nsxf__caption">` line if you would rather not
+warn people about that.
 
 ---
 
