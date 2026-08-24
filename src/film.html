@@ -3,12 +3,12 @@
 
     <div class="nsxf__frame">
       <video
-        poster="{{BASE}}/media/film-poster.webp"
+        poster="{{POSTER}}"
         preload="none"
         playsinline
         controls
-        data-src-hi="{{BASE}}/media/film.mp4"
-        data-src-lo="{{BASE}}/media/film-720.mp4"
+        data-src-hi="{{SRC_HI}}"
+        data-src-lo="{{SRC_LO}}"
         aria-label="Фильм об игре МЕМО"></video>
 
       <button class="nsxf__play" type="button" aria-label="Смотреть фильм">
@@ -18,7 +18,8 @@
       </button>
     </div>
 
-    <p class="nsxf__caption">Фильм со звуком &mdash; 43 секунды</p>
+    <!-- delete this line if you would rather have no caption -->
+    <p class="nsxf__caption">{{CAPTION}}</p>
 
   </div>
 </div>

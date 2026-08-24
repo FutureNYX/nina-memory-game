@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-Builds tilda/film-block.html - the brand film as one paste into a Tilda
-T123 "HTML-код" block.
+Builds the film blocks - each one paste into a Tilda T123 "HTML-код" block.
 
     python build_film.py --base https://futurenyx.github.io/nina-memory-game
 
-The film is served from GitHub Pages rather than uploaded to Tilda, so it
-is not squeezed through Tilda's 5 MB ceiling: 34 MB at 1080p, or 13 MB at
-720p for narrow screens, chosen at load. Nothing downloads until the
-visitor presses play.
+  film-block.html        vertical 9:16 cut,  1080x1920 / 720x1280
+  film-wide-block.html   landscape 16:9 cut, 1920x1080 / 1280x720
+
+The films are served from GitHub Pages rather than uploaded to Tilda, so
+Tilda's 5 MB ceiling never applies to them. Nothing downloads until the
+visitor presses play: preload="none" behind a poster image.
 """
 import argparse
 import io
@@ -19,54 +20,67 @@ SRC = os.path.join(HERE, 'src')
 
 JS = """(function () {
   'use strict';
-  var wrap = document.querySelector('.nsxf');
-  if (!wrap) return;
-  var v = wrap.querySelector('video');
-  var btn = wrap.querySelector('.nsxf__play');
-  if (!v || !btn) return;
+  var wraps = document.querySelectorAll('.nsxf');
+  Array.prototype.forEach.call(wraps, function (wrap) {
+    var v = wrap.querySelector('video');
+    var btn = wrap.querySelector('.nsxf__play');
+    if (!v || !btn || v.src) return;
 
-  /* Pick a file once, at load. Narrow screens and data-saver get the 13 MB
-     720p; everything else the 34 MB 1080p. preload is "none", so choosing
-     a source costs nothing until play is pressed. */
-  function chooseSrc() {
+    /* Pick a file once, at load. Narrow screens and data-saver get the
+       small one. preload is "none", so choosing a source costs nothing
+       until play is actually pressed. */
     var conn = navigator.connection || {};
     var small = Math.min(screen.width, screen.height) < 500;
-    if (conn.saveData || small) return v.getAttribute('data-src-lo');
-    return v.getAttribute('data-src-hi');
-  }
-  v.src = chooseSrc();
+    v.src = (conn.saveData || small)
+      ? v.getAttribute('data-src-lo')
+      : v.getAttribute('data-src-hi');
 
-  btn.addEventListener('click', function () {
-    btn.hidden = true;
-    var q = v.play();
-    if (q && q.catch) q.catch(function () { btn.hidden = false; });
-  });
-
-  /* bring the button back when the film ends or is paused */
-  v.addEventListener('ended', function () { btn.hidden = false; });
-  v.addEventListener('pause', function () {
-    if (v.currentTime > 0 && !v.ended && v.currentTime < v.duration) return;
-    btn.hidden = false;
+    btn.addEventListener('click', function () {
+      btn.hidden = true;
+      var q = v.play();
+      if (q && q.catch) q.catch(function () { btn.hidden = false; });
+    });
+    v.addEventListener('ended', function () { btn.hidden = false; });
+    v.addEventListener('pause', function () {
+      if (v.currentTime > 0 && !v.ended && v.currentTime < v.duration) return;
+      btn.hidden = false;
+    });
   });
 })();"""
 
 HEADER = """<!-- ===========================================================
-     NINA SECHKO x ROBINEAU - the film
+     NINA SECHKO x ROBINEAU - the film (%(shape)s)
 
      PASTE ALL OF THIS INTO ONE TILDA BLOCK:
        Библиотека блоков -> Другое -> T123 "HTML-код"
 
      The film is NOT uploaded to Tilda, so Tilda's 5 MB ceiling
      does not apply to it. It streams from:
-       %s
-     1080p (34 MB) on a normal screen, 720p (13 MB) on a narrow
-     one. Nothing downloads until the visitor presses play - a
-     visitor who scrolls past pays only for the 47 KB poster.
+       %(base)s
+     %(hi_note)s on a normal screen, %(lo_note)s on a narrow one,
+     chosen automatically. Nothing downloads until the visitor
+     presses play - scrolling past costs only the poster image.
 
      Worth knowing, near the top of the CSS:
-       --ground      background colour of this section
-       --film-max-h  how large the film is allowed to get (82svh)
+       --ground                 background colour of this section
+       --film-ar / --film-ar-num  shape of the film (%(ar)s)
+       --film-max-h / --film-max-w  how large it is allowed to get
      =========================================================== -->"""
+
+FILMS = [
+    dict(out='film-block.html',
+         shape='vertical', ar='9/16', ar_num='0.5625',
+         hi='/media/film.mp4', lo='/media/film-720.mp4',
+         poster='/media/film-poster.webp',
+         hi_note='1080x1920 (34 MB)', lo_note='720x1280 (13 MB)',
+         caption='Фильм со звуком &mdash; 43 секунды'),
+    dict(out='film-wide-block.html',
+         shape='landscape', ar='16/9', ar_num='1.7778',
+         hi='/media/film-wide.mp4', lo='/media/film-wide-720.mp4',
+         poster='/media/film-wide-poster.webp',
+         hi_note='1920x1080 (37 MB)', lo_note='1280x720 (12 MB)',
+         caption='Фильм со звуком &mdash; 42 секунды'),
+]
 
 
 def read(name):
@@ -74,27 +88,40 @@ def read(name):
         return fh.read()
 
 
-def build(base):
+def build_one(f, base):
     base = base.rstrip('/')
+
+    css = read('film.css')
+    css = css.replace('  --film-ar:9/16;\n  --film-ar-num:0.5625;',
+                      '  --film-ar:%s;\n  --film-ar-num:%s;' % (f['ar'], f['ar_num']))
+
+    body = read('film.html')
+    body = body.replace('{{POSTER}}', base + f['poster'])
+    body = body.replace('{{SRC_HI}}', base + f['hi'])
+    body = body.replace('{{SRC_LO}}', base + f['lo'])
+    body = body.replace('{{CAPTION}}', f['caption'])
+
     parts = [
-        HEADER % base,
+        HEADER % {'shape': f['shape'], 'base': base, 'ar': f['ar'],
+                  'hi_note': f['hi_note'], 'lo_note': f['lo_note']},
         '<style>\n'
         "/* let the block escape Tilda's 960px container */\n"
         '.t-rec .t123__wrapper,.t123 .t-container,.t123 .t-col'
         '{max-width:100%!important;padding:0!important;margin:0!important}\n'
-        + read('film.css') + '</style>',
-        read('film.html').replace('{{BASE}}', base),
+        + css + '</style>',
+        body,
         '<script>\n' + JS + '\n</script>',
     ]
     text = '\n\n'.join(parts) + '\n'
 
-    path = os.path.join(HERE, 'tilda', 'film-block.html')
+    path = os.path.join(HERE, 'tilda', f['out'])
     if not os.path.isdir(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
     with io.open(path, 'w', encoding='utf-8', newline='\n') as fh:
         fh.write(text)
     n = len(text.encode('utf-8'))
-    print('  film-block.html  %d bytes (%.0f%% of Tilda limit)' % (n, n / 1000.0))
+    print('  %-24s %5d bytes (%.0f%% of limit)  %s %s'
+          % (f['out'], n, n / 1000.0, f['shape'], f['ar']))
 
 
 if __name__ == '__main__':
@@ -102,6 +129,7 @@ if __name__ == '__main__':
     ap.add_argument('--base',
                     default='https://futurenyx.github.io/nina-memory-game')
     a = ap.parse_args()
-    print('Building film block...')
-    build(a.base)
+    print('Building film blocks...')
+    for f in FILMS:
+        build_one(f, a.base)
     print('Done.')
