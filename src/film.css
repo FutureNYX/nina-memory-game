@@ -1,0 +1,101 @@
+/* ============================================================
+   NINA SECHKO x ROBINEAU - the film
+   Self-contained, namespaced under .nsxf.
+
+   Nothing of the video downloads until someone presses play:
+   preload="none" plus a poster image. So a 34 MB film costs a
+   visitor who scrolls past exactly 47 KB.
+   ============================================================ */
+.nsxf *,.nsxf *::before,.nsxf *::after{box-sizing:border-box}
+.nsxf{
+  /* background of this section - match it to the block above or below */
+  --ground:#ECEDF1;
+  --ink:#16161A;
+  --ink-soft:#5D5D68;
+
+  --sans:"TildaSans","Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --pad:clamp(20px,5.5vw,64px);
+
+  /* how large the film is allowed to get, as a share of screen height.
+     Capped through the WIDTH so the 9:16 shape is never broken. */
+  --film-max-h:82svh;
+
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--ground);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+.nsxf p{margin:0}
+.nsxf video{display:block;max-width:100%}
+
+.nsxf__inner{
+  padding:clamp(56px,10vw,120px) var(--pad);
+  margin-inline:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:clamp(18px,3vw,28px);
+}
+
+.nsxf__frame{
+  position:relative;
+  aspect-ratio:9/16;
+  width:min(100%,calc(var(--film-max-h) * 0.5625));
+  border-radius:14px;
+  overflow:hidden;
+  background:#000;
+  box-shadow:0 1px 2px rgba(22,22,26,.06),0 30px 70px -40px rgba(22,22,26,.45);
+}
+.nsxf__frame video{
+  width:100%;
+  height:100%;
+  /* contain so the whole frame is always visible, never trimmed */
+  object-fit:contain;
+  background:#000;
+}
+
+/* ---- play button ---- */
+.nsxf__play{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  border:0;
+  padding:0;
+  margin:0;
+  background:transparent;
+  cursor:pointer;
+  -webkit-appearance:none;
+  appearance:none;
+  transition:opacity .3s ease;
+}
+.nsxf__play[hidden]{display:none}
+.nsxf__playDot{
+  width:clamp(64px,16vw,92px);
+  aspect-ratio:1;
+  border-radius:50%;
+  background:rgba(255,255,255,.92);
+  display:grid;
+  place-items:center;
+  box-shadow:0 8px 30px rgba(0,0,0,.28);
+  transition:transform .22s cubic-bezier(.2,.7,.3,1),background-color .22s;
+}
+.nsxf__play:hover .nsxf__playDot{transform:scale(1.06);background:#fff}
+.nsxf__play:active .nsxf__playDot{transform:scale(.97)}
+.nsxf__play:focus-visible{outline:3px solid #D9674F;outline-offset:4px;border-radius:14px}
+.nsxf__playDot svg{width:36%;height:36%;margin-left:12%;fill:#16161A}
+
+.nsxf__caption{
+  font-size:clamp(13px,3vw,15px);
+  line-height:1.5;
+  color:var(--ink-soft);
+  text-align:center;
+  max-width:44ch;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .nsxf__playDot{transition:none}
+}

@@ -24,6 +24,15 @@
      four edges, so a long fade eats into it. */
   --fade-y:17%;
   --fade-x:6%;
+
+  /* ===== HOW MUCH OF THE TOP OF THE PICTURE TO CUT =====
+     Measured: the closed box leaves 26.8% of the frame empty above it,
+     so 13% removes half that dead space and still never touches the box.
+     Cutting the top also fills the screen more, so the box reads bigger.
+     0% shows the whole frame. Above ~20% the cards start losing their
+     tops during the burst. Off on wide screens, where the frame already
+     sits inside the page rather than filling it. */
+  --crop-top:13%;
   --ink:#16161A;
   --ink-soft:#5D5D68;
   --ink-mid:#33333C;
@@ -59,7 +68,10 @@
   height:350svh;
   background:radial-gradient(120% 78% at 50% 42%,var(--ground-hi) 0%,var(--ground) 55%,var(--ground-lo) 100%);
 }
-@media (min-width:860px){.nsx__scrolly{height:450vh;height:450svh}}
+@media (min-width:860px){
+  .nsx{--crop-top:0%}
+  .nsx__scrolly{height:450vh;height:450svh}
+}
 @media (max-width:520px){.nsx__scrolly{height:320vh;height:320svh}}
 
 .nsx__stage{

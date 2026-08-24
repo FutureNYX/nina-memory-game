@@ -52,6 +52,15 @@
      four edges, so a long fade eats into it. */
   --fade-y:17%;
   --fade-x:6%;
+
+  /* ===== HOW MUCH OF THE TOP OF THE PICTURE TO CUT =====
+     Measured: the closed box leaves 26.8% of the frame empty above it,
+     so 13% removes half that dead space and still never touches the box.
+     Cutting the top also fills the screen more, so the box reads bigger.
+     0% shows the whole frame. Above ~20% the cards start losing their
+     tops during the burst. Off on wide screens, where the frame already
+     sits inside the page rather than filling it. */
+  --crop-top:13%;
   --ink:#16161A;
   --ink-soft:#5D5D68;
   --ink-mid:#33333C;
@@ -88,7 +97,10 @@
   height:350svh;
   background:radial-gradient(120% 78% at 50% 42%,var(--ground-hi) 0%,var(--ground) 55%,var(--ground-lo) 100%);
 }
-@media (min-width:860px){.nsx__scrolly{height:450vh;height:450svh}}
+@media (min-width:860px){
+  .nsx{--crop-top:0%}
+  .nsx__scrolly{height:450vh;height:450svh}
+}
 @media (max-width:520px){.nsx__scrolly{height:320vh;height:320svh}}
 
 .nsx__stage{
@@ -457,13 +469,23 @@
   if (!scrolly || !stage || !ctx) return;
 
   var cssW = 0, cssH = 0, dpr = 1, lastFrame = 1, lastDrawn = -1, running = false;
+  var cropTop = 0;
+
+  /* How much of the top of the frame to cut, read from the --crop-top CSS
+     custom property so it lives next to the other visual settings. */
+  function readCrop() {
+    var v = parseFloat(getComputedStyle(root).getPropertyValue('--crop-top'));
+    var n = isNaN(v) ? 0 : v / 100;
+    return n < 0 ? 0 : n > 0.4 ? 0.4 : n;
+  }
 
   function sizeCanvas() {
     var r = canvas.getBoundingClientRect();
     if (r.width < 1 || r.height < 1) return false;
     var d = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-    if (r.width === cssW && r.height === cssH && d === dpr) return false;
-    dpr = d; cssW = r.width; cssH = r.height;
+    if (r.width === cssW && r.height === cssH && d === dpr
+        && cropTop === readCrop()) return false;
+    dpr = d; cssW = r.width; cssH = r.height; cropTop = readCrop();
     canvas.width = Math.round(cssW * dpr);
     canvas.height = Math.round(cssH * dpr);
     lastDrawn = -1;
@@ -485,11 +507,20 @@
     var img = nearestLoaded(idx);
     if (!img) return;
     if (canvas.width < 2 && !sizeCanvas()) return;
+
+    /* take a slice off the top of the source, then fill the canvas with
+       what is left - so the dead space above the box goes and the box
+       ends up larger, rather than the picture simply sliding upwards. */
+    var sw = img.naturalWidth || 756;
+    var sy = Math.round((img.naturalHeight || 1344) * cropTop);
+    var sh = (img.naturalHeight || 1344) - sy;
+    var ar = sw / sh;
+
     var cw = canvas.width, ch = canvas.height;
     var dw, dh;
-    if (cw / ch < FRAME_AR) { dh = ch; dw = ch * FRAME_AR; }
-    else { dw = cw; dh = cw / FRAME_AR; }
-    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    if (cw / ch < ar) { dh = ch; dw = ch * ar; }
+    else { dw = cw; dh = cw / ar; }
+    ctx.drawImage(img, 0, sy, sw, sh, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
   }
 
   function capOpacity(p, from, to) {
