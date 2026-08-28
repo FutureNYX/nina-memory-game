@@ -218,10 +218,17 @@
        phone's address bar slid away, so this is deliberately a
        one-off. 768px is the same breakpoint as the CSS above. */
     var wide = window.matchMedia('(min-width: 768px)').matches;
+
+    /* Only a genuinely constrained visitor gets the 720 file. The test is
+       PHYSICAL pixels, not CSS ones: a 375pt iPhone is 1125 real pixels
+       across and deserves the full-HD cut. Measuring CSS width instead
+       sent every phone to the small file, which defeated the point. */
     var conn = navigator.connection || {};
+    var dpr  = window.devicePixelRatio || 1;
+    var real = Math.min(screen.width, screen.height) * dpr;
     var lean = conn.saveData === true ||
                /2g/.test(conn.effectiveType || '') ||
-               Math.min(screen.width, screen.height) < 400;
+               real < 700;
 
     var key = wide ? 'wide' : 'vertical';
     v.poster = v.getAttribute('data-poster-' + key);
