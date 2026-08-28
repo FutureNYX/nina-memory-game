@@ -1,0 +1,269 @@
+<!-- ===========================================================
+     NINA SECHKO x ROBINEAU - the hero film
+
+     PASTE ALL OF THIS INTO ONE TILDA BLOCK:
+       Библиотека блоков -> Другое -> T123 "HTML-код"
+
+     One block, two films. The phone gets the vertical cut and the
+     desktop gets the landscape one, chosen once when the page loads:
+
+       phone    1080x1920  nina-vertical.mp4      (43 s)
+       desktop  1920x1080  nina-wide.mp4          (42 s)
+
+     Both are full HD, re-encoded from the 4K masters at CRF 19, so
+     this is the quality ceiling of the source rather than of the web.
+     They stream from GitHub Pages, which answers range requests, so
+     playback starts on the first chunk instead of after a download:
+       https://futurenyx.github.io/nina-memory-game
+
+     Neither file is uploaded to Tilda, so Tilda's 5 MB ceiling does
+     not apply.
+
+     EDGE TO EDGE, AND NEVER TRIMMED. The stage takes the film's own
+     aspect ratio, so the picture spans the full width of the screen
+     with nothing cropped off the top or bottom. On a phone that means
+     the section is exactly as tall as the film is at full width.
+
+     The controls you are most likely to want are the first few lines
+     of the CSS below:
+       --ground        colour behind the film
+       --ar-mobile     shape of the vertical cut   (1080/1920)
+       --ar-desktop    shape of the landscape cut  (1920/1080)
+       --max-h         how tall the desktop film may get
+     =========================================================== -->
+
+<style>
+/* let the block escape Tilda's 960px container */
+.t-rec .t123__wrapper,.t123 .t-container,.t123 .t-col{max-width:100%!important;padding:0!important;margin:0!important}
+
+/* ============================================================
+   Self-contained, namespaced under .nsxh so nothing here can
+   reach the rest of the page.
+   ============================================================ */
+.nsxh *,.nsxh *::before,.nsxh *::after{box-sizing:border-box}
+.nsxh{
+  /* colour behind the film - it shows only while the poster loads */
+  --ground:#000;
+
+  /* Shape of each cut. These are the files' real dimensions; the
+     stage adopts them so the film is never letterboxed and never
+     trimmed. Change them only if you re-cut the films. */
+  --ar-mobile:1080/1920;
+  --ar-desktop:1920/1080;
+
+  /* How tall the desktop film may get before it stops growing.
+     100svh fills the window; 82svh leaves a hint of the next
+     section visible, which reads as an invitation to scroll. */
+  --max-h:100svh;
+
+  --sans:"TildaSans","Golos Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+
+  display:block;
+  background:var(--ground);
+  font-family:var(--sans);
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+
+.nsxh__stage{
+  position:relative;
+  width:100%;
+  /* the film's own shape: contain and cover become the same thing,
+     so it fills the width edge to edge with nothing cut off */
+  aspect-ratio:var(--ar-mobile);
+  background:#000;
+  overflow:hidden;
+  line-height:0;
+}
+
+@media (min-width:768px){
+  .nsxh__stage{
+    aspect-ratio:var(--ar-desktop);
+    /* cap through the WIDTH so the shape is never broken */
+    width:min(100%, calc(var(--max-h) * 16 / 9));
+    margin-inline:auto;
+  }
+}
+
+.nsxh__stage video{
+  position:absolute;
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;   /* belt and braces: never trims the picture */
+  background:#000;
+}
+
+/* ---- sound ----
+   The film carries real sound, but a browser will only autoplay a
+   muted video, so it starts muted and this turns it on. */
+.nsxh__sound{
+  position:absolute;
+  right:clamp(14px,3.5vw,28px);
+  bottom:clamp(14px,3.5vw,28px);
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  height:clamp(40px,10vw,48px);
+  padding:0 clamp(14px,3.4vw,18px);
+  border:0;
+  border-radius:999px;
+  background:rgba(0,0,0,.42);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  color:#fff;
+  font-family:var(--sans);
+  font-size:clamp(12px,3vw,14px);
+  line-height:1;
+  letter-spacing:.01em;
+  cursor:pointer;
+  -webkit-appearance:none;
+  appearance:none;
+  transition:background-color .22s ease,transform .22s cubic-bezier(.2,.7,.3,1);
+}
+.nsxh__sound:hover{background:rgba(0,0,0,.62)}
+.nsxh__sound:active{transform:scale(.97)}
+.nsxh__sound:focus-visible{outline:3px solid #D9674F;outline-offset:3px}
+.nsxh__sound svg{width:18px;height:18px;fill:currentColor;flex:none}
+.nsxh__sound .nsxh__soundOn{display:none}
+.nsxh[data-sound="on"] .nsxh__sound .nsxh__soundOn{display:block}
+.nsxh[data-sound="on"] .nsxh__sound .nsxh__soundOff{display:none}
+.nsxh[data-sound="on"] .nsxh__sound .nsxh__soundLabel{display:none}
+
+/* ---- big play button ----
+   Only ever seen if autoplay is refused: iOS Low Power Mode, or a
+   visitor who has asked for reduced motion. */
+.nsxh__play{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  display:grid;
+  place-items:center;
+  border:0;
+  padding:0;
+  margin:0;
+  background:transparent;
+  cursor:pointer;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.nsxh__play[hidden]{display:none}
+.nsxh__playDot{
+  width:clamp(64px,16vw,92px);
+  aspect-ratio:1;
+  border-radius:50%;
+  background:rgba(255,255,255,.92);
+  display:grid;
+  place-items:center;
+  box-shadow:0 8px 30px rgba(0,0,0,.28);
+  transition:transform .22s cubic-bezier(.2,.7,.3,1),background-color .22s;
+}
+.nsxh__play:hover .nsxh__playDot{transform:scale(1.06);background:#fff}
+.nsxh__play:active .nsxh__playDot{transform:scale(.97)}
+.nsxh__play:focus-visible{outline:3px solid #D9674F;outline-offset:4px}
+.nsxh__playDot svg{width:36%;height:36%;margin-left:12%;fill:#16161A}
+
+@media (prefers-reduced-motion:reduce){
+  .nsxh__sound,.nsxh__playDot{transition:none}
+}
+</style>
+
+<div class="nsxh" data-sound="off">
+  <div class="nsxh__stage">
+
+    <video
+      preload="none"
+      playsinline
+      webkit-playsinline
+      muted
+      loop
+      disablepictureinpicture
+      data-vertical="https://futurenyx.github.io/nina-memory-game/media/nina-vertical.mp4"
+      data-vertical-lo="https://futurenyx.github.io/nina-memory-game/media/nina-vertical-720.mp4"
+      data-wide="https://futurenyx.github.io/nina-memory-game/media/nina-wide.mp4"
+      data-wide-lo="https://futurenyx.github.io/nina-memory-game/media/nina-wide-720.mp4"
+      data-poster-vertical="https://futurenyx.github.io/nina-memory-game/media/nina-vertical-poster.webp"
+      data-poster-wide="https://futurenyx.github.io/nina-memory-game/media/nina-wide-poster.webp"
+      aria-label="Нина Сечко для ROBINEAU"></video>
+
+    <button class="nsxh__play" type="button" aria-label="Смотреть" hidden>
+      <span class="nsxh__playDot">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+    </button>
+
+    <button class="nsxh__sound" type="button" aria-label="Включить звук">
+      <svg class="nsxh__soundOff" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z" opacity=".55"/><path d="M3 3l18 18-1.4 1.4L1.6 4.4z"/></svg>
+      <svg class="nsxh__soundOn" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a6.8 6.8 0 0 1 0 13.4v2.1a8.9 8.9 0 0 0 0-17.6z"/></svg>
+      <span class="nsxh__soundLabel">Звук</span>
+    </button>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  Array.prototype.forEach.call(document.querySelectorAll('.nsxh'), function (wrap) {
+    var v    = wrap.querySelector('video');
+    var play = wrap.querySelector('.nsxh__play');
+    var snd  = wrap.querySelector('.nsxh__sound');
+    if (!v || v.src) return;
+
+    /* ---- pick the cut once, at load ----
+       Deciding again on resize would restart the film every time a
+       phone's address bar slid away, so this is deliberately a
+       one-off. 768px is the same breakpoint as the CSS above. */
+    var wide = window.matchMedia('(min-width: 768px)').matches;
+    var conn = navigator.connection || {};
+    var lean = conn.saveData === true ||
+               /2g/.test(conn.effectiveType || '') ||
+               Math.min(screen.width, screen.height) < 400;
+
+    var key = wide ? 'wide' : 'vertical';
+    v.poster = v.getAttribute('data-poster-' + key);
+    v.src = v.getAttribute(lean ? 'data-' + key + '-lo' : 'data-' + key);
+
+    /* ---- autoplay, muted, once it is actually on screen ----
+       preload is "none" until then, so a visitor who never scrolls
+       this far pays for the poster alone. */
+    var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function start() {
+      if (calm) { play.hidden = false; return; }
+      v.preload = 'auto';
+      var q = v.play();
+      if (q && q.catch) q.catch(function () { play.hidden = false; });
+    }
+
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { start(); }
+          else if (!v.paused) { v.pause(); }
+        });
+      }, { threshold: 0.15 });
+      io.observe(wrap);
+    } else {
+      start();
+    }
+
+    play.addEventListener('click', function () {
+      play.hidden = true;
+      v.preload = 'auto';
+      var q = v.play();
+      if (q && q.catch) q.catch(function () { play.hidden = false; });
+    });
+
+    snd.addEventListener('click', function () {
+      v.muted = !v.muted;
+      wrap.setAttribute('data-sound', v.muted ? 'off' : 'on');
+      snd.setAttribute('aria-label', v.muted ? 'Включить звук' : 'Выключить звук');
+      if (v.paused) { play.hidden = true; v.play(); }
+    });
+  });
+})();
+</script>

@@ -5,3 +5,7 @@ __pycache__/
 test-tilda.html
 t_hero-block-title.html
 t_hero-block-title-longfade.html
+
+# 4K masters pulled from Drive ("Nina's videos"). ~400 MB, and the
+# repo only ever serves the full-HD encodes built from them.
+_orig/

@@ -94,10 +94,40 @@ Each is one paste into its own T123 block, and each works in any position.
 
 | Block | What it is |
 |---|---|
+| `nina-hero-block.html` | **The hero.** Nina's film, edge to edge — vertical on phones, landscape on desktop |
 | `hero-block-title*.html` | The scroll-driven box-opening animation |
 | `play-block.html` | «Как играть» — the looping card film beside the rules |
 | `film-block.html` | The brand film, **vertical** cut — click to play, with sound |
 | `film-wide-block.html` | The same film, **landscape** cut |
+
+Two of these are easy to confuse, so: **`nina-hero-block.html` is the hero.**
+`hero-block-title*.html` is named "hero" for historical reasons but is the
+box-opening animation, which belongs further down the page.
+
+`nina-hero-block.html` supersedes `film-block.html` and `film-wide-block.html`
+— same two films, better encodes, edge to edge, and one block instead of two.
+The old blocks and their files are left in place so nothing breaks while you
+swap over; once the hero is live on the page they can be deleted.
+
+### The hero block
+
+| Screen | File | Size |
+|---|---|---|
+| phone | `nina-vertical.mp4` 1080×1920 | 58 MB |
+| phone, lean connection | `nina-vertical-720.mp4` 720×1280 | 15 MB |
+| desktop | `nina-wide.mp4` 1920×1080 | 50 MB |
+| desktop, lean connection | `nina-wide-720.mp4` 1280×720 | 15 MB |
+
+Both full-HD files are re-encoded from the 4K masters at CRF 19, so they are
+as good as the source allows rather than as good as a web upload usually is.
+
+It plays **edge to edge with nothing cropped**: the section takes the film's
+own shape, so on a phone the picture spans the full width and the section is
+exactly as tall as the film. Nothing is trimmed off the top or bottom.
+
+It starts muted and loops, because no browser will autoplay a video with
+sound. The rounded **«Звук»** button in the corner turns the sound on. Nothing
+loads until the block scrolls into view, and it pauses again when it leaves.
 
 ### The film, and Tilda's 5 MB ceiling
 

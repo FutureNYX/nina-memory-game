@@ -31,7 +31,13 @@ SEQ_START, SEQ_DUR, FPS = 0.0, 9.60, 15
 #   frames/     756px  - low-DPR phones and non-retina desktops
 #   frames-hi/ 1080px  - the source's own resolution, for 3x phones and
 #                        retina desktops, where 756 visibly softens
-SIZES = [(756, 1344, 'frames'), (1080, 1920, 'frames-hi')]
+#
+# The fourth value is WebP quality. It used to be 72 for both, which is what
+# made the animation look soft on a large screen: frames-hi is already the
+# source's own 1080x1920, so nothing was lost to resolution, only to the
+# encoder. 95 on the retina tier costs about 6 MB across all 123 frames and
+# removes the softness entirely.
+SIZES = [(756, 1344, 'frames', 88), (1080, 1920, 'frames-hi', 95)]
 DROP = set(range(56, 62))     # the light-leak transition
 KEEP_UNTIL = 129              # sampled-frame index; 123 survive after DROP
 
@@ -53,7 +59,7 @@ def main(src):
             os.makedirs(d)
 
     n = 0
-    for W, H, outdir in SIZES:
+    for W, H, outdir, quality in SIZES:
         frames = os.path.join(HERE, outdir)
         if not os.path.isdir(frames):
             os.makedirs(frames)
@@ -62,10 +68,10 @@ def main(src):
         for f in os.listdir(tmp):
             os.remove(os.path.join(tmp, f))
 
-        print('sampling sequence at %dpx...' % W)
+        print('sampling sequence at %dpx, quality %d...' % (W, quality))
         run('-ss', str(SEQ_START), '-t', str(SEQ_DUR), '-i', src,
             '-vf', 'fps=%d,scale=%d:%d:flags=lanczos' % (FPS, W, H),
-            '-c:v', 'libwebp', '-quality', '72', '-compression_level', '6',
+            '-c:v', 'libwebp', '-quality', str(quality), '-compression_level', '6',
             '-preset', 'photo', os.path.join(tmp, 'r_%03d.webp'))
 
         n = 0
