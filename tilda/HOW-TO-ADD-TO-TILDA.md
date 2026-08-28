@@ -97,17 +97,16 @@ Each is one paste into its own T123 block, and each works in any position.
 | `nina-hero-block.html` | **The hero.** Nina's film, edge to edge — vertical on phones, landscape on desktop |
 | `hero-block-title*.html` | The scroll-driven box-opening animation |
 | `play-block.html` | «Как играть» — the looping card film beside the rules |
-| `film-block.html` | The brand film, **vertical** cut — click to play, with sound |
-| `film-wide-block.html` | The same film, **landscape** cut |
 
 Two of these are easy to confuse, so: **`nina-hero-block.html` is the hero.**
 `hero-block-title*.html` is named "hero" for historical reasons but is the
 box-opening animation, which belongs further down the page.
 
-`nina-hero-block.html` supersedes `film-block.html` and `film-wide-block.html`
-— same two films, better encodes, edge to edge, and one block instead of two.
-The old blocks and their files are left in place so nothing breaks while you
-swap over; once the hero is live on the page they can be deleted.
+`film-block.html` and `film-wide-block.html` **were deleted on 28 Aug 2026**,
+along with `film*.mp4` and `build_film.py`. `nina-hero-block.html` replaces
+both: same two films, re-encoded from the 4K masters, edge to edge, one block
+instead of two. The live page was checked first and carried neither of them.
+Everything is recoverable from git history if it is ever wanted back.
 
 ### The hero block
 
@@ -129,25 +128,12 @@ It starts muted and loops, because no browser will autoplay a video with
 sound. The rounded **«Звук»** button in the corner turns the sound on. Nothing
 loads until the block scrolls into view, and it pauses again when it leaves.
 
-### The film, and Tilda's 5 MB ceiling
+### Tilda's 5 MB ceiling does not apply
 
-The film blocks do **not** upload anything to Tilda, so the 5 MB limit never
-applies to them. They stream from GitHub Pages:
-
-| Block | Normal screen | Narrow screen |
-|---|---|---|
-| `film-block.html` (9:16) | 1080×1920, 34 MB | 720×1280, 13 MB |
-| `film-wide-block.html` (16:9) | 1920×1080, 37 MB | 1280×720, 12 MB |
-
-That is roughly seven times the picture Tilda's own limit would allow. The
-right file is chosen automatically from screen size.
-
-Nothing downloads until someone presses play — the video is `preload="none"`
-behind a poster image, so a visitor who just scrolls past pays under 90 KB.
-
-Both play **with sound**, since they are brand films rather than background
-loops. Delete the `<p class="nsxf__caption">` line if you would rather not
-warn people about that.
+None of these blocks upload anything to Tilda, so its 5 MB limit never comes
+into it. Everything streams from GitHub Pages, which answers range requests
+with 206, so a 58 MB film starts playing on its first chunk rather than after
+a download. That is roughly ten times the picture Tilda's own limit allows.
 
 ---
 

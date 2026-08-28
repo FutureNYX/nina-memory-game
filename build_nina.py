@@ -12,9 +12,10 @@ HEVC at ~36 Mbps, which no browser should be asked to stream. Each becomes:
   media/nina-vertical.mp4  1080x1920  CRF 19, the phone hero
   media/nina-vertical-720.mp4  720x1280
 
-New filenames on purpose: film.mp4 and film-wide.mp4 stay put so the old
-blocks keep working, and a changed name defeats the CDN and browser caches
-that would otherwise keep serving the softer file.
+New filenames rather than overwriting film.mp4 and film-wide.mp4, so that no
+CDN or browser cache anywhere could keep serving the softer picture. Those old
+files, their two Tilda blocks and build_film.py were deleted on 28 Aug 2026
+once the live page was confirmed not to use them; git history still has them.
 
 CRF 19 at 1080p downscaled from 4K is visually transparent at normal viewing
 distance; the previous 7 Mbps encode was not, which is the whole reason for
