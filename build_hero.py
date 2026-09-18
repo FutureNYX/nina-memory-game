@@ -58,7 +58,7 @@ CAP_REST = """
         <!-- box lying open -->
         <div class="nsx__cap" data-from="0.56" data-to="0.72">
           <p class="nsx__eyebrow">Внутри</p>
-          <p class="nsx__capText">50 парных карточек с картинами Нины Сечко.</p>
+          <p class="nsx__capText">50 карт с картинами Нины Сечко.</p>
         </div>
 
         <!-- as the cards burst out -->
